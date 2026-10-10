@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta name="unit2-source-audit" content="Source-faithful additions"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Packet Scheduling</title><style>
+:root{--ink:#182334;--muted:#5b687a;--paper:#fff;--bg:#f2f5fa;--line:#dce3ed;--accent:#3157c8;--soft:#eaf0ff;--green:#087f5b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{background:linear-gradient(120deg,#15264a,#3157c8);color:white;padding:42px 22px}header .wrap,main{max-width:1050px;margin:auto}header p{max-width:800px;color:#e4eaff}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.15;margin:0 0 12px}h2{margin-top:0;color:#203d82}h3{color:#28467e}main{padding:24px 18px 55px}.card{background:var(--paper);padding:24px;margin:18px 0;border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 18px #1b2c4810}.tag{display:inline-block;background:#e9efff;color:#2546a1;border-radius:999px;padding:4px 10px;font-size:.82rem;font-weight:700;margin:3px}.callout{padding:14px 16px;border-left:4px solid var(--accent);background:var(--soft);border-radius:8px}.note{padding:14px 16px;border-left:4px solid #d18a18;background:#fff7e7;border-radius:8px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.95rem}th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#edf2fc}pre{background:#f1f4f9;border-radius:6px;padding:14px;overflow:auto}.diagram{width:100%;height:auto;background:#fbfcff;border:1px solid var(--line);border-radius:12px;margin:12px 0}.q{border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0}.answer{color:var(--green);font-weight:650}footer{text-align:center;color:var(--muted);padding:24px}li{margin:5px 0}.small{font-size:.9rem;color:var(--muted)}@media(max-width:650px){.card{padding:17px}table{font-size:.85rem}th,td{padding:7px}}
+</style></head><body><header><div class="wrap"><span class="tag">CN | Unit 2</span><h1>Packet Scheduling</h1><p>How routers decide which queued packet gets transmitted next - with diagrams, policy comparisons, worked examples and exam answers.</p></div></header><main>
+<section class="card">
+<h2>1. Meaning of packet scheduling</h2>
+<p><b>Packet scheduling</b> is the process by which a router or network device chooses which queued packet to transmit next when multiple packets are waiting for an output link. The scheduling policy determines the order in which packets from different queues or traffic classes receive service.</p>
+<div class="callout"><b>Core idea:</b> when an output link is busy, packets may wait in queues. Packet scheduling decides <em>who gets the next turn</em>.</div>
+<svg class="diagram" viewBox="0 0 900 300" role="img" aria-label="Packets from three queues are selected by a scheduler and sent to an output link">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#3157c8"/></marker></defs>
+<g font-family="Arial" font-size="17" fill="#182334">
+<rect x="30" y="35" width="210" height="58" rx="10" fill="#eaf0ff" stroke="#3157c8"/><text x="135" y="59" text-anchor="middle">Queue 1</text><text x="135" y="80" text-anchor="middle" font-size="14">Voice packets</text>
+<rect x="30" y="120" width="210" height="58" rx="10" fill="#e8f7ef" stroke="#087f5b"/><text x="135" y="144" text-anchor="middle">Queue 2</text><text x="135" y="165" text-anchor="middle" font-size="14">Video packets</text>
+<rect x="30" y="205" width="210" height="58" rx="10" fill="#fff1db" stroke="#b36a00"/><text x="135" y="229" text-anchor="middle">Queue 3</text><text x="135" y="250" text-anchor="middle" font-size="14">Data packets</text>
+<path d="M240 64 L340 120 M240 149 L340 149 M240 234 L340 180" stroke="#3157c8" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+<rect x="345" y="100" width="220" height="100" rx="14" fill="#f0eaff" stroke="#7551b5" stroke-width="2"/><text x="455" y="139" text-anchor="middle" font-weight="bold">Scheduler</text><text x="455" y="165" text-anchor="middle" font-size="14">Select next packet</text>
+<path d="M565 150 L660 150" stroke="#3157c8" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="665" y="111" width="200" height="78" rx="12" fill="#eaf0ff" stroke="#3157c8"/><text x="765" y="142" text-anchor="middle">Output link</text><text x="765" y="165" text-anchor="middle" font-size="14">Transmission</text>
+</g></svg>
+<p class="small">Illustrative diagram: the queue labels are examples to explain scheduling, not a required classification for every router.</p>
+</section>
+
+<section class="card">
+<h2>2. Why packet scheduling matters</h2>
+<ul><li><b>Delay:</b> determines how long packets wait before transmission.</li><li><b>Fairness:</b> determines whether one flow or class can monopolize the link.</li><li><b>Quality of Service (QoS):</b> can give delay-sensitive or priority traffic more favorable service.</li><li><b>Bandwidth sharing:</b> controls how link capacity is shared among queues.</li><li><b>Starvation risk:</b> a poorly chosen policy may leave low-priority packets waiting indefinitely.</li></ul>
+</section>
+
+<section class="card">
+<h2>3. Common packet-scheduling policies</h2>
+<h3>A. First-In, First-Out (FIFO) / First-Come, First-Served</h3>
+<p>Packets are transmitted in the order in which they arrive at the queue. FIFO is simple and does not deliberately favor a packet based on its traffic class.</p>
+<ul><li><b>Advantages:</b> simple, low overhead, easy to implement.</li><li><b>Limitations:</b> a delay-sensitive packet may wait behind a long queue of ordinary packets; it offers no class-based priority by itself.</li></ul>
+<h3>B. Priority Queuing</h3>
+<p>Packets are classified into priority queues. The scheduler serves a higher-priority queue before a lower-priority queue according to the configured policy.</p>
+<ul><li><b>Advantages:</b> important or delay-sensitive traffic can be served quickly.</li><li><b>Limitations:</b> if high-priority traffic is continuously present, lower-priority traffic can suffer starvation.</li></ul>
+<h3>C. Round Robin (RR)</h3>
+<p>The scheduler visits queues in turn and serves a packet from each non-empty queue. This gives active queues repeated opportunities to transmit.</p>
+<ul><li><b>Advantages:</b> simple sharing across queues and less risk of complete starvation than strict priority.</li><li><b>Limitations:</b> equal packet turns do not necessarily mean equal bandwidth when packet sizes differ.</li></ul>
+<h3>D. Weighted Fair Queuing (WFQ) - additional context</h3>
+<p>WFQ assigns different weights to flows or queues and aims to share link capacity in proportion to those weights while providing more controlled service than simple round robin. This is useful background for understanding QoS scheduling.</p>
+<div class="note"><b>Source-scope note:</b> FIFO, priority queuing, round robin and WFQ are standard networking examples used here to explain packet scheduling. Check the prescribed Unit 2 PPT/syllabus for the exact list your instructor expects; do not assume every example is explicitly named in the lecture material.</div>
+</section>
+
+<section class="card">
+<h2>4. Compare the policies</h2>
+<table><thead><tr><th>Policy</th><th>How next packet is selected</th><th>Main strength</th><th>Main concern</th></tr></thead><tbody>
+<tr><td>FIFO</td><td>Oldest packet first</td><td>Simple and predictable order</td><td>No differentiated priority; queueing delay can grow</td></tr>
+<tr><td>Priority queuing</td><td>Highest-priority non-empty queue first</td><td>Fast service for high-priority traffic</td><td>Lower-priority starvation</td></tr>
+<tr><td>Round Robin</td><td>Rotate across active queues</td><td>Repeated opportunities for each queue</td><td>Unequal packet sizes complicate bandwidth fairness</td></tr>
+<tr><td>WFQ</td><td>Share service according to configured weights</td><td>More controlled weighted sharing</td><td>More implementation complexity</td></tr>
+</tbody></table>
+</section>
+
+<section class="card">
+<h2>5. Worked example: priority scheduling</h2>
+<p>Assume a router has two queues waiting for the same output link:</p>
+<table><tr><th>Queue</th><th>Traffic</th><th>Packets waiting</th><th>Priority</th></tr><tr><td>Q1</td><td>Voice</td><td>V1, V2</td><td>High</td></tr><tr><td>Q2</td><td>File transfer</td><td>F1, F2, F3</td><td>Normal</td></tr></table>
+<p>Under strict priority scheduling, if Q1 is non-empty whenever a packet is selected, the service order begins <b>V1 then V2</b>, then normal traffic can be served when Q1 becomes empty. If new voice packets keep arriving, Q2 may wait a long time.</p>
+<div class="callout"><b>Exam point:</b> priority scheduling improves service for the favored class, but strict priority can starve lower-priority queues.</div>
+<p class="small">This is a simplified illustrative example; real schedulers may use different rules, queue limits, and priority levels.</p>
+</section>
+
+<section class="card">
+<h2>6. Packet scheduling and QoS</h2>
+<p>Different applications have different needs. Interactive voice and video are sensitive to delay and jitter, while file transfers often care more about completing correctly than about very low delay. A scheduler can help differentiate service by selecting packets from queues according to priority, rotation, or configured weights.</p>
+<table><tr><th>Traffic type (example)</th><th>Possible scheduling consideration</th></tr><tr><td>Voice / interactive media</td><td>Low queueing delay and jitter may be important</td></tr><tr><td>Bulk file transfer</td><td>Fair access to capacity; may tolerate more delay</td></tr><tr><td>Mixed traffic</td><td>Balance priority needs against fairness and starvation risk</td></tr></table>
+<p>Scheduling alone does not guarantee end-to-end QoS: congestion level, available capacity, queue management, routing and other network mechanisms also matter.</p>
+</section>
+
+<section class="card">
+<h2>7. Exam-ready answers</h2>
+<h3>3-mark answer: Define packet scheduling.</h3>
+<p>Packet scheduling is the method used by a router to decide which packet from its waiting queues is transmitted next on an output link. It affects queueing delay, fairness and the allocation of link capacity. Examples include FIFO, priority queuing and round robin.</p>
+<h3>5-mark answer: Explain priority queuing with merits and limitations.</h3>
+<p>In priority queuing, packets are classified into queues with different priority levels. The scheduler serves packets from a higher-priority non-empty queue before serving lower-priority queues. It is useful when important or delay-sensitive traffic needs faster service. Its advantages include differentiated service and potentially lower delay for high-priority packets. Its main limitation is starvation: a continuously busy high-priority queue may prevent lower-priority packets from being transmitted promptly.</p>
+<h3>8-10-mark answer: Explain packet scheduling and compare common policies.</h3>
+<p>Packet scheduling decides the order in which queued packets are transmitted over an output link. It is important because it affects delay, fairness, bandwidth sharing and QoS. In FIFO, packets are served in arrival order; it is simple but does not distinguish traffic classes. In priority queuing, higher-priority queues are served first, improving service for selected traffic but potentially starving lower-priority traffic. In round robin, the scheduler rotates among active queues, improving sharing, although equal packet turns may not provide equal bandwidth when packet sizes vary. Weighted fair queuing shares service according to configured weights and can offer more controlled bandwidth allocation, at the cost of greater complexity. The appropriate policy depends on application requirements, fairness goals and network configuration.</p>
+</section>
+
+<section class="card">
+<h2>8. Practice questions</h2>
+<div class="q"><b>Q1. What decision does a packet scheduler make?</b><details><summary>Show answer</summary><p class="answer">It selects which queued packet is transmitted next on an output link.</p></details></div>
+<div class="q"><b>Q2. Which policy serves packets in arrival order?</b><details><summary>Show answer</summary><p class="answer">FIFO (First-In, First-Out).</p></details></div>
+<div class="q"><b>Q3. State one major risk of strict priority queuing.</b><details><summary>Show answer</summary><p class="answer">Starvation or excessive delay for lower-priority queues.</p></details></div>
+<div class="q"><b>Q4. Why may round robin not give equal bandwidth when packet sizes differ?</b><details><summary>Show answer</summary><p class="answer">Each queue may receive the same number of packet turns, but packets can contain different numbers of bytes.</p></details></div>
+<div class="q"><b>Q5. Does packet scheduling alone guarantee end-to-end QoS?</b><details><summary>Show answer</summary><p class="answer">No. It is one mechanism; capacity, congestion, routing and other network behavior also affect end-to-end QoS.</p></details></div>
+<div class="q"><b>Q6. Compare FIFO and priority queuing in two points.</b><details><summary>Show answer</summary><p class="answer">FIFO serves by arrival order and is simple; priority queuing selects by configured priority and can favor important traffic, but may starve low-priority traffic.</p></details></div>
+</section>
+
+<section class="card">
+<h2>9. Quick revision</h2>
+<ul><li><b>Packet scheduling:</b> selects the next packet for transmission.</li><li><b>FIFO:</b> arrival order.</li><li><b>Priority:</b> high-priority queues first; starvation risk.</li><li><b>Round Robin:</b> rotate across active queues.</li><li><b>WFQ:</b> weighted sharing of service.</li><li><b>Why it matters:</b> delay, fairness, bandwidth sharing and QoS.</li></ul>
+<div class="callout"><b>Before the exam:</b> practise drawing a queue to scheduler to output-link diagram and prepare one advantage and one limitation for each policy covered in your class notes.</div>
+</section>
+
+<section class="card source-note" id="ppt-source-details"><h2>📘 PPT terminology and fairness caveat</h2>
+<ul><li>Router resources to allocate include <strong>bandwidth, buffer space and CPU cycles</strong>.</li><li><strong>FIFO/FCFS:</strong> packets leave in arrival order. A full queue commonly uses tail drop, discarding a newly arriving packet. The PPT also notes RED can drop randomly before the average queue becomes full.</li><li><strong>Fair queuing:</strong> keep a separate queue for each flow on an output line and serve queues round-robin.</li><li><strong>Fair-queuing caveat:</strong> a flow sending larger packets can receive more bandwidth than a flow sending smaller packets if service fairness is measured only by packet turns.</li><li><strong>WFQ:</strong> the PPT attributes a more advanced method to Demers (1990): account for packet arrival time and length, sort by finishing times, and transmit in that order.</li></ul></section>
+</main><footer>Computer Networks | Visual revision notes | Topic 19</footer></body></html>

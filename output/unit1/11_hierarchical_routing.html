@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hierarchical Routing | Computer Networks Unit 1</title><style>
+:root{--ink:#172033;--muted:#526078;--line:#dbe3ef;--paper:#f4f7fb;--blue:#1d4ed8;--pale:#eff6ff;--teal:#0f766e}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.68 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+main{max-width:1050px;margin:auto;padding:28px 20px 64px}.hero{padding:34px 36px;border-radius:24px;background:linear-gradient(135deg,#e0f2fe,#eef2ff 60%,#f0fdfa);border:1px solid #cbdcf4;margin-bottom:22px}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;font-weight:800;color:var(--blue)}h1{font-size:clamp(2.1rem,5vw,3.3rem);line-height:1.1;margin:.2em 0}.lead{font-size:1.15rem;max-width:780px;color:#34435c}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chips span{padding:5px 11px;border:1px solid #bfdbfe;background:#fff;border-radius:999px;font-size:.83rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 30px;margin:18px 0;box-shadow:0 5px 18px #0f172a08}h2{font-size:1.55rem;margin-top:0;border-bottom:1px solid var(--line);padding-bottom:10px}h3{font-size:1.12rem;margin:1.25em 0 .35em}p{margin:.65em 0}li{margin:.38em 0}.diagram{margin:18px auto;max-width:780px;overflow-x:auto}.diagram svg{display:block;width:100%;height:auto;min-width:480px}.callout{background:var(--pale);border-left:4px solid var(--blue);padding:13px 16px;margin:18px 0;border-radius:8px}.note{color:var(--muted);font-size:.92rem;background:#f8fafc;padding:11px 13px;border-radius:8px}.formula{font-family:ui-monospace,Consolas,monospace;background:#eff6ff;padding:14px;border-radius:10px;text-align:center;font-size:1.1rem;color:#1e40af}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#eff6ff}tr:nth-child(even) td{background:#fafcff}code{background:#eef2ff;padding:2px 5px;border-radius:4px}.exam{border-top:5px solid var(--teal)}details{border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin:10px 0}summary{cursor:pointer;font-weight:700}.revision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.revision-grid div{display:flex;flex-direction:column;gap:4px;padding:13px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.revision-grid span{color:var(--muted);font-size:.93rem}.source-note{background:#fbfdff}@media(max-width:650px){main{padding:12px}.hero,.card{padding:22px 18px}table{font-size:.85rem}th,td{padding:8px}}
+</style></head>
+<body><main>
+<section class="hero">
+ <p class="eyebrow">COMPUTER NETWORKS · UNIT 1 · TOPIC 11</p>
+ <h1>Hierarchical Routing</h1>
+ <p class="lead">A way to organize a large network into regions or areas so that routers do not need to keep equally detailed routing information about every router in the entire network.</p>
+ <div class="chips"><span>Routing scalability</span><span>Regions / areas</span><span>Routing tables</span><span>Exam-ready notes</span></div>
+</section>
+
+<section class="card">
+ <h2>1. Why hierarchical routing?</h2>
+ <p>In a small network, a router may be able to maintain routes to every destination. As a network grows, the number of routers and destinations grows too. Large routing tables consume memory, and exchanging detailed routing information can create overhead.</p>
+ <p><strong>Hierarchical routing</strong> addresses this scaling problem by dividing the network into regions, areas, or levels. A router maintains detailed information about destinations in its own region and summarized or less detailed information about destinations outside it.</p>
+ <div class="callout"><strong>Key idea:</strong> Use detailed routes locally and more general routes for remote parts of the network. This reduces routing-table size, but may sometimes choose a route that is not globally shortest.</div>
+</section>
+
+<section class="card">
+ <h2>2. Conceptual network hierarchy</h2>
+ <p>The diagram is a conceptual illustration of regions and a central interconnection layer. Actual network designs may use different names and structures.</p>
+ <div class="diagram">
+<svg viewBox="0 0 720 340" role="img" aria-label="Illustration of a hierarchical routing network">
+ <defs><style>.box{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.core{fill:#dcfce7;stroke:#15803d;stroke-width:2}.edge{stroke:#64748b;stroke-width:2.5;fill:none}.t{font:15px Arial;fill:#1e3a8a;font-weight:bold}.s{font:12px Arial;fill:#475569}</style></defs>
+ <rect class="box" x="270" y="15" width="180" height="48" rx="10"/><text class="t" x="360" y="44" text-anchor="middle">Region A</text>
+ <rect class="box" x="55" y="125" width="180" height="48" rx="10"/><text class="t" x="145" y="154" text-anchor="middle">Area A1</text>
+ <rect class="core" x="270" y="125" width="180" height="48" rx="10"/><text class="t" x="360" y="154" text-anchor="middle">Backbone / Core</text>
+ <rect class="box" x="485" y="125" width="180" height="48" rx="10"/><text class="t" x="575" y="154" text-anchor="middle">Area A2</text>
+ <rect class="box" x="55" y="245" width="180" height="48" rx="10"/><text class="t" x="145" y="274" text-anchor="middle">Local routers</text>
+ <rect class="box" x="485" y="245" width="180" height="48" rx="10"/><text class="t" x="575" y="274" text-anchor="middle">Local routers</text>
+ <path class="edge" d="M360 63 V95 H145 V123"/><path class="edge" d="M360 63 V123"/><path class="edge" d="M360 95 H575 V123"/>
+ <path class="edge" d="M145 173 V243"/><path class="edge" d="M575 173 V243"/>
+ <text class="s" x="360" y="320" text-anchor="middle">Conceptual illustration only — not a protocol-specific topology</text>
+</svg>
+</div>
+ <ul>
+  <li><strong>Local / intra-region routing:</strong> routers use detailed information to reach destinations within their own region.</li>
+  <li><strong>Inter-region routing:</strong> routers use routes or summaries to reach other regions through connecting routers.</li>
+  <li><strong>Higher-level structure:</strong> regions connect through a backbone or higher-level routing layer.</li>
+ </ul>
+ <p class="note">Do not assume that every hierarchical network has exactly three levels. The number and names of levels depend on the network design.</p>
+</section>
+
+<section class="card">
+ <h2>3. How hierarchical routing works</h2>
+ <ol>
+  <li><strong>Divide the network:</strong> organize routers and destinations into regions or areas.</li>
+  <li><strong>Maintain local detail:</strong> routers keep detailed routing information for their own region.</li>
+  <li><strong>Represent remote destinations compactly:</strong> routes to outside regions can be summarized by region, prefix, or an exit/next-hop router, depending on the design.</li>
+  <li><strong>Forward within the region:</strong> if the destination is local, use the local routing information.</li>
+  <li><strong>Forward outside the region:</strong> send the packet toward an appropriate inter-region router or backbone route.</li>
+  <li><strong>Continue at the destination region:</strong> the remote region's routers use their local information to deliver the packet to the final destination.</li>
+ </ol>
+ <div class="formula">Local destination → detailed local route<br>Remote destination → summarized / higher-level route</div>
+</section>
+
+<section class="card">
+ <h2>4. Simple forwarding example</h2>
+ <p>Assume a network has three regions: A, B, and C. Host A7 is in Region A and Host C4 is in Region C.</p>
+ <ol>
+  <li>The source router checks whether C4 is in its own region. It is not.</li>
+  <li>The router uses its inter-region routing information to send the packet toward the gateway/backbone route for Region C.</li>
+  <li>Routers in the core forward the packet toward Region C using higher-level routes.</li>
+  <li>Once the packet enters Region C, local routing information delivers it to C4.</li>
+ </ol>
+ <p class="note">This is a simplified conceptual example. It does not specify a particular routing protocol, addressing plan, or exact routing-table entries.</p>
+</section>
+
+<section class="card">
+ <h2>5. Routing-table size: the trade-off</h2>
+ <p>Suppose a network contains many routers distributed across several regions. Without hierarchy, a router might need an entry for each destination or destination network. With hierarchy, it may keep detailed entries for local destinations and a smaller set of entries for remote regions.</p>
+ <table><thead><tr><th>Aspect</th><th>Flat routing</th><th>Hierarchical routing</th></tr></thead><tbody>
+  <tr><td>Organization</td><td>Routing is considered across one flat network.</td><td>Network is divided into regions, areas, or levels.</td></tr>
+  <tr><td>Local routes</td><td>Routes are maintained according to the protocol's flat routing model.</td><td>Detailed information can be kept for the local region.</td></tr>
+  <tr><td>Remote routes</td><td>May require detailed entries for many remote destinations.</td><td>Remote destinations may be represented by summaries or higher-level routes.</td></tr>
+  <tr><td>Routing-table size</td><td>Can become large as the network grows.</td><td>Can be reduced through aggregation and hierarchy.</td></tr>
+  <tr><td>Route optimality</td><td>Detailed global information can support globally shortest routes when the algorithm and metric provide that property.</td><td>Summarization can hide detail, so the chosen route may not be globally shortest.</td></tr>
+  <tr><td>Design complexity</td><td>Conceptually simpler organization for small networks.</td><td>Requires region design and careful inter-region routing.</td></tr>
+ </tbody></table>
+</section>
+
+<section class="card">
+ <h2>6. Advantages</h2>
+ <ul>
+  <li><strong>Scalability:</strong> supports the organization of large networks.</li>
+  <li><strong>Smaller routing tables:</strong> remote destinations can be represented more compactly.</li>
+  <li><strong>Less routing information to maintain:</strong> routers need not store every remote detail.</li>
+  <li><strong>Administrative structure:</strong> regions can align with network boundaries or operational responsibilities.</li>
+  <li><strong>Containment of local changes:</strong> with suitable design and summarization, some internal changes need not be represented in full detail outside the region.</li>
+ </ul>
+ <h2>7. Limitations</h2>
+ <ul>
+  <li><strong>Potentially non-optimal paths:</strong> summarization can conceal a better route.</li>
+  <li><strong>More planning:</strong> region boundaries, gateways, and summaries must be designed carefully.</li>
+  <li><strong>Inter-region dependencies:</strong> connectivity between regions and the backbone becomes important.</li>
+  <li><strong>Possible troubleshooting complexity:</strong> a route may depend on both local and higher-level decisions.</li>
+ </ul>
+</section>
+
+<section class="card">
+ <h2>8. Hierarchical routing vs. flat routing</h2>
+ <table><thead><tr><th>Feature</th><th>Flat routing</th><th>Hierarchical routing</th></tr></thead><tbody>
+  <tr><td>Network model</td><td>One logical routing domain without a routing hierarchy.</td><td>Multiple regions or levels.</td></tr>
+  <tr><td>Routing information</td><td>Can require detailed information across the network.</td><td>Uses local detail and higher-level information for remote areas.</td></tr>
+  <tr><td>Scalability</td><td>May be less suitable as the network becomes very large.</td><td>Designed to improve scalability.</td></tr>
+  <tr><td>Optimality</td><td>May enable globally informed route choices, depending on the algorithm.</td><td>Route summarization may sacrifice global optimality.</td></tr>
+ </tbody></table>
+</section>
+
+<section class="card exam">
+ <h2>9. Exam-ready answers</h2>
+ <h3>3-mark answer: What is hierarchical routing?</h3>
+ <p>Hierarchical routing is a routing approach in which a large network is divided into regions or levels. Routers maintain detailed routes for destinations in their own region and use summarized or higher-level routes for destinations in other regions. It helps reduce routing-table size and improves scalability.</p>
+ <h3>5-mark answer: Explain hierarchical routing.</h3>
+ <p>As a network grows, maintaining detailed routes to every destination increases routing-table size and routing-information overhead. Hierarchical routing divides the network into regions or areas. Routers use detailed information for local destinations and summarized or higher-level routes for remote destinations. Packets for local destinations are forwarded using local routes, while packets for remote destinations are sent toward an appropriate inter-region router or backbone. This improves scalability and reduces routing information, but route summarization may produce a path that is not globally shortest.</p>
+ <h3>8–10-mark answer: Explain hierarchical routing with a diagram.</h3>
+ <p>Begin with the definition and the scalability problem. Draw a network divided into regions connected through a backbone or higher-level layer. Explain local routing, inter-region routing, route summarization, and packet forwarding from one region to another. Discuss reduced routing-table size and lower information overhead as advantages. Explain that summarization may hide route details and result in non-optimal paths. End with a comparison to flat routing.</p>
+</section>
+
+<section class="card">
+ <h2>10. Question bank</h2>
+ <details open><summary>Short-answer questions</summary><ol>
+  <li>Define hierarchical routing.</li>
+  <li>Why is hierarchical routing useful in large networks?</li>
+  <li>What is meant by a region or area in hierarchical routing?</li>
+  <li>What is route summarization?</li>
+ </ol></details>
+ <details><summary>5-mark questions</summary><ol>
+  <li>Explain the operation of hierarchical routing with an example.</li>
+  <li>Compare flat routing and hierarchical routing.</li>
+  <li>List the advantages and limitations of hierarchical routing.</li>
+ </ol></details>
+ <details><summary>8–10-mark questions</summary><ol>
+  <li>Explain hierarchical routing with a neat diagram.</li>
+  <li>Discuss how hierarchy reduces routing-table size and explain the trade-off in route optimality.</li>
+ </ol></details>
+</section>
+
+<section class="card">
+ <h2>11. Quick revision</h2>
+ <div class="revision-grid">
+  <div><strong>Purpose</strong><span>Scale routing to large networks</span></div>
+  <div><strong>Organization</strong><span>Regions, areas, or levels</span></div>
+  <div><strong>Local traffic</strong><span>Detailed local routing information</span></div>
+  <div><strong>Remote traffic</strong><span>Summarized or higher-level routes</span></div>
+  <div><strong>Main benefit</strong><span>Smaller routing tables and reduced information overhead</span></div>
+  <div><strong>Main trade-off</strong><span>May choose a non-globally-shortest path</span></div>
+ </div>
+ <h3>Self-check</h3>
+ <ol>
+  <li>Can you explain why flat routing becomes difficult at scale?</li>
+  <li>Can you draw a network divided into regions?</li>
+  <li>Can you explain local versus inter-region forwarding?</li>
+  <li>Can you state two advantages and two limitations?</li>
+ </ol>
+</section>
+
+<section class="card source-note">
+ <h2>Source and scope note</h2>
+ <p>This page covers the general Unit 1 concept of hierarchical routing. The diagram and Region A / B / C example are illustrative, not copied from the lecture PPT. The syllabus separately lists advanced Internet topics such as Autonomous Systems and BGP under self-learning/term-work context; those protocol-specific details are intentionally not treated here as core examinable material.</p>
+</section>
+
+<footer style="text-align:center;color:#64748b;padding:24px 0">Computer Networks · Unit 1 · Hierarchical Routing</footer>
+</main></body></html>

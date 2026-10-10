@@ -1,0 +1,107 @@
+<!doctype html><html lang="en"><head><meta name="unit2-source-audit" content="Source-faithful additions"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Traffic Shaping — CN Unit 2</title><style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#182338;--muted:#53627a;--line:#dbe3ef;--blue:#2459a9;--pale:#eaf2ff;--green:#e7f7ef;--amber:#fff4dc;--red:#fff0ef}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.68 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#142d52,#2459a9);color:white;padding:42px max(22px,calc((100% - 1100px)/2))}
+header .eyebrow{letter-spacing:.12em;text-transform:uppercase;font-size:.78rem;opacity:.85}h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.13;margin:.35rem 0 1rem}header p{max-width:850px;color:#e6efff}
+main{max-width:1100px;margin:28px auto;padding:0 18px 60px}.layout{display:grid;grid-template-columns:1fr;gap:18px}
+section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 5px 20px #1c35500a}
+h2{margin:.1rem 0 1rem;font-size:1.55rem}h3{margin:1.2rem 0 .45rem;font-size:1.12rem;color:#234c87}
+p{margin:.55rem 0}ul,ol{padding-left:1.4rem}li{margin:.28rem 0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.95rem}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--pale)}
+.callout{padding:14px 16px;border-left:4px solid var(--blue);background:var(--pale);border-radius:8px;margin:14px 0}.good{background:var(--green);border-left-color:#218653}.warn{background:var(--amber);border-left-color:#bc8218}.bad{background:var(--red);border-left-color:#bd5149}
+svg{max-width:100%;height:auto;display:block;margin:12px auto}.tag{display:inline-block;padding:3px 9px;border-radius:999px;background:#ffffff20;border:1px solid #ffffff45;margin:3px 5px 3px 0;font-size:.83rem}
+pre{white-space:pre-wrap;background:#17243a;color:#edf4ff;padding:16px;border-radius:10px;overflow:auto}.answer{border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0}.small{font-size:.9rem;color:var(--muted)}footer{padding:24px;text-align:center;color:var(--muted);font-size:.9rem}
+@media(min-width:850px){.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}}
+</style></head><body>
+<header><div class="eyebrow">Computer Networks • Unit 2 • Topic 18</div><h1>Traffic Shaping</h1><p>Visual study notes on traffic smoothing, leaky bucket and token bucket algorithms, key comparisons, and exam-ready answers.</p><span class="tag">QoS</span><span class="tag">Algorithms</span><span class="tag">Diagrams</span><span class="tag">Exam practice</span></header>
+<main><div class="layout"><section><h2>1. Meaning of traffic shaping</h2>
+<p><b>Traffic shaping</b> is a traffic-management technique that regulates the rate and pattern at which packets are injected into a network. It smooths bursts so that traffic conforms to an agreed or configured traffic profile.</p>
+<div class="callout"><b>Core idea:</b> Instead of allowing every burst to enter the network immediately, a shaper controls when packets are released. Depending on the implementation, packets may wait in a queue; if the queue fills, packets may be dropped.</div>
+<p>Traffic shaping is used to reduce sudden bursts, make traffic more predictable, help meet service agreements, and reduce the chance that a burst overloads a downstream link.</p>
+</section><section><h2>2. Why shaping is needed</h2>
+<ul><li>Applications may generate traffic in bursts rather than at a constant rate.</li><li>A burst can temporarily exceed the capacity available on a link.</li><li>Uncontrolled bursts may build queues, increase delay and jitter, and cause packet loss.</li><li>A network operator may want traffic to remain within a defined rate/burst profile.</li></ul>
+<div class="callout warn"><b>Important distinction:</b> Shaping does not create additional link capacity. It changes the timing of packet transmission; this can introduce waiting delay.</div>
+</section><section><h2>3. Visual model: bursty input becomes smoother output</h2>
+<svg viewBox="0 0 900 340" role="img" aria-label="Traffic shaping diagram from bursty input through a queue and rate controller to smoother output">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 Z" fill="#2459a9"/></marker></defs>
+<rect x="20" y="28" width="175" height="78" rx="12" fill="#eaf2ff" stroke="#2459a9" stroke-width="2"/><text x="107" y="58" text-anchor="middle" font-size="17" font-weight="bold" fill="#182338">Bursty input</text><text x="107" y="82" text-anchor="middle" font-size="13" fill="#53627a">uneven arrivals</text>
+<path d="M195 67 H265" stroke="#2459a9" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="270" y="28" width="185" height="78" rx="12" fill="#fff4dc" stroke="#bc8218" stroke-width="2"/><text x="362" y="58" text-anchor="middle" font-size="17" font-weight="bold" fill="#182338">Queue / buffer</text><text x="362" y="82" text-anchor="middle" font-size="13" fill="#53627a">holds early packets</text>
+<path d="M455 67 H525" stroke="#2459a9" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="530" y="28" width="170" height="78" rx="12" fill="#e7f7ef" stroke="#218653" stroke-width="2"/><text x="615" y="58" text-anchor="middle" font-size="17" font-weight="bold" fill="#182338">Rate control</text><text x="615" y="82" text-anchor="middle" font-size="13" fill="#53627a">enforces profile</text>
+<path d="M700 67 H770" stroke="#2459a9" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="775" y="28" width="105" height="78" rx="12" fill="#eaf2ff" stroke="#2459a9" stroke-width="2"/><text x="827" y="58" text-anchor="middle" font-size="15" font-weight="bold" fill="#182338">Smoothed</text><text x="827" y="80" text-anchor="middle" font-size="15" font-weight="bold" fill="#182338">output</text>
+<text x="35" y="145" font-size="15" fill="#182338" font-weight="bold">Illustrative packet arrivals over time</text>
+<line x1="55" y1="285" x2="410" y2="285" stroke="#53627a" stroke-width="2"/><line x1="55" y1="285" x2="55" y2="165" stroke="#53627a" stroke-width="2"/>
+<g fill="#2459a9"><rect x="75" y="245" width="18" height="40"/><rect x="98" y="210" width="18" height="75"/><rect x="121" y="175" width="18" height="110"/><rect x="144" y="225" width="18" height="60"/><rect x="167" y="255" width="18" height="30"/><rect x="240" y="245" width="18" height="40"/><rect x="263" y="210" width="18" height="75"/><rect x="286" y="175" width="18" height="110"/></g>
+<text x="232" y="310" font-size="13" fill="#53627a">Time →</text>
+<line x1="490" y1="285" x2="845" y2="285" stroke="#53627a" stroke-width="2"/><line x1="490" y1="285" x2="490" y2="165" stroke="#53627a" stroke-width="2"/>
+<g fill="#218653"><rect x="510" y="245" width="18" height="40"/><rect x="540" y="235" width="18" height="50"/><rect x="570" y="225" width="18" height="60"/><rect x="600" y="235" width="18" height="50"/><rect x="630" y="225" width="18" height="60"/><rect x="660" y="235" width="18" height="50"/><rect x="690" y="225" width="18" height="60"/><rect x="720" y="235" width="18" height="50"/><rect x="750" y="225" width="18" height="60"/><rect x="780" y="235" width="18" height="50"/></g>
+<text x="665" y="310" font-size="13" fill="#53627a">Time →</text>
+</svg>
+<p class="small">Conceptual illustration only—not a measured traffic trace. The shaper releases packets more evenly than they arrive.</p>
+</section><section><h2>4. Two common traffic-shaping algorithms</h2>
+<div class="two">
+<div class="answer"><h3>Leaky Bucket</h3><p>Packets enter a finite buffer. The bucket drains at a configured, approximately steady rate. If packets arrive too quickly, they wait in the buffer; if the buffer is full, arriving packets may be discarded.</p><ul><li>Produces a relatively steady output rate.</li><li>Bursts are absorbed only up to the buffer capacity.</li><li>Excess traffic may be lost when the bucket overflows.</li></ul></div>
+<div class="answer"><h3>Token Bucket</h3><p>Tokens are generated at a configured rate and stored up to a maximum bucket size. Sending a packet consumes tokens according to the packet's size or configured accounting unit. Stored tokens allow a limited burst.</p><ul><li>Controls long-term average rate.</li><li>Allows bursts when tokens have accumulated.</li><li>Bucket capacity determines the burst allowance.</li></ul></div>
+</div>
+<div class="callout"><b>Memory aid:</b> Leaky bucket → smoother, near-constant output. Token bucket → controlled average rate with permitted bursts.</div>
+</section><section><h2>5. Leaky bucket: working and example</h2>
+<ol><li>Packets arrive and are placed in a finite queue.</li><li>The output mechanism transmits queued packets at the configured rate.</li><li>If arrivals exceed the output rate temporarily, the queue grows.</li><li>If the queue becomes full, additional packets may be dropped.</li></ol>
+<p><b>Illustrative example:</b> Suppose the configured output is 2 Mb/s and traffic arrives in a short burst equivalent to 6 Mb of data. Ignoring packet overhead and other traffic, transmitting that data at 2 Mb/s takes 3 seconds. The shaper can spread the burst over time instead of sending all of it at once; the waiting time depends on packet arrival order and the queue's state.</p>
+<div class="callout warn">A leaky-bucket shaper's exact delay cannot be calculated from the rate alone. We would also need packet arrival times, queue occupancy, buffer size, and the packet being considered.</div>
+</section><section><h2>6. Token bucket: working and example</h2>
+<ol><li>Tokens are added at a steady configured rate.</li><li>The token bucket stores tokens up to a maximum capacity.</li><li>When a packet is ready, it is transmitted if sufficient tokens are available; otherwise it waits or is handled according to policy.</li><li>During an idle period, tokens can accumulate, allowing a later burst within the bucket's limits.</li></ol>
+<p><b>Illustrative example:</b> Tokens are generated at 1 Mb/s and the bucket can hold 4 Mb worth of tokens. After a sufficiently long idle period, up to 4 Mb of traffic may be eligible for an immediate burst, subject to the implementation and link capacity. Over a longer interval, the token-generation rate constrains the average eligible traffic rate.</p>
+<div class="callout good"><b>Key point:</b> The token bucket does not mean the sender can transmit unlimited traffic at 1 Mb/s or that every short interval is capped at exactly 1 Mb/s. It allows a bounded burst while controlling the long-term rate.</div>
+</section><section><h2>7. Leaky bucket vs. token bucket</h2>
+<table><thead><tr><th>Basis</th><th>Leaky bucket</th><th>Token bucket</th></tr></thead><tbody>
+<tr><td>Basic mechanism</td><td>Packets wait in a queue; output drains at a configured rate.</td><td>Tokens accumulate; packets need tokens to be eligible for transmission.</td></tr>
+<tr><td>Burst handling</td><td>Absorbs bursts in the queue but smooths output.</td><td>Permits bursts using previously accumulated tokens.</td></tr>
+<tr><td>Output pattern</td><td>Typically steadier.</td><td>May be bursty within the configured allowance.</td></tr>
+<tr><td>Long-term control</td><td>Controlled by the drain rate.</td><td>Controlled by the token-generation rate.</td></tr>
+<tr><td>Finite storage</td><td>Packet buffer can overflow.</td><td>Token storage is capped; packet queueing/drop policy is implementation-dependent.</td></tr>
+<tr><td>Useful when</td><td>A smooth transmission rate is desired.</td><td>A controlled average rate with limited bursts is desirable.</td></tr>
+</tbody></table>
+<p class="small">These are the standard conceptual distinctions. Real devices may combine shaping, policing, queues, and scheduler policies.</p>
+</section><section><h2>8. Traffic shaping vs. traffic policing vs. throttling</h2>
+<table><thead><tr><th>Mechanism</th><th>Main action</th><th>What happens to excess traffic?</th></tr></thead><tbody>
+<tr><td><b>Traffic shaping</b></td><td>Regulates when packets are sent to fit a traffic profile.</td><td>Usually queued and delayed; packets can be dropped if the queue fills.</td></tr>
+<tr><td><b>Traffic policing</b></td><td>Checks whether traffic conforms to a rate/profile.</td><td>May drop, mark, or reclassify non-conforming packets, depending on policy.</td></tr>
+<tr><td><b>Traffic throttling</b></td><td>Broadly reduces or limits a traffic rate.</td><td>May reduce sending rate, restrict service, queue, or reject traffic depending on the system.</td></tr>
+</tbody></table>
+<div class="callout">For an exam answer, define the term used in the question first. Do not treat shaping, policing, and throttling as exact synonyms.</div>
+</section><section><h2>9. Advantages and limitations</h2>
+<div class="two"><div><h3>Advantages</h3><ul><li>Reduces sudden bursts entering a network.</li><li>Makes traffic more predictable.</li><li>Can help enforce a service contract or configured traffic profile.</li><li>May reduce queue overflow and congestion caused by bursts.</li><li>Token bucket can preserve useful burst flexibility.</li></ul></div><div><h3>Limitations</h3><ul><li>Queueing can increase delay.</li><li>Excessive shaping can hurt delay-sensitive applications.</li><li>Finite buffers can still overflow and cause loss.</li><li>Shaping cannot increase physical link capacity.</li><li>Configuration must reflect traffic needs and service objectives.</li></ul></div></div>
+</section><section><h2>10. Exam-ready answers</h2>
+<div class="answer"><h3>3 marks — Define traffic shaping</h3><p>Traffic shaping is a congestion/QoS technique that controls the rate and pattern at which packets enter a network. It regulates bursty traffic to conform to a configured traffic profile. Packets may be buffered and transmitted later, which smooths traffic but can introduce delay. Leaky bucket and token bucket are common shaping algorithms.</p></div>
+<div class="answer"><h3>5 marks — Explain the leaky bucket algorithm</h3><p>The leaky bucket algorithm uses a finite queue and a fixed output rate. Incoming packets are placed in the queue. The queue is serviced at the configured rate, so bursts are spread over time and output becomes smoother. If the buffer fills, new packets may be discarded. It helps control burstiness, but may introduce queueing delay and packet loss during sustained overload. Draw a diagram showing bursty input → finite bucket/queue → constant-rate output.</p></div>
+<div class="answer"><h3>5 marks — Explain the token bucket algorithm</h3><p>Tokens are generated at a configured rate and stored up to a maximum bucket capacity. To transmit a packet, the sender or shaper must have enough tokens according to the configured packet accounting. Tokens accumulate during idle periods, so a later burst can be sent using stored tokens. The token-generation rate controls long-term traffic while bucket capacity controls the permitted burst size. If tokens are unavailable, packets may wait or be handled by a configured policy.</p></div>
+<div class="answer"><h3>8–10 marks — Explain traffic shaping and compare leaky bucket and token bucket</h3><p>Begin with the definition and need for shaping. Draw a block diagram of bursty input, queue/rate controller and smoothed output. Explain leaky bucket: finite packet buffer, fixed drain rate, burst smoothing and overflow drops. Explain token bucket: token generation, token storage, packet eligibility, and controlled bursts. Compare the two by mechanism, burst allowance, output pattern, rate control and limitations. Conclude that shaping regulates packet timing and may add delay; it does not create extra network capacity.</p></div>
+</section><section><h2>11. Practice questions</h2>
+<ol>
+<li>Define traffic shaping and state two reasons for using it.</li>
+<li>Draw and explain the leaky bucket algorithm.</li>
+<li>Explain token bucket operation with a suitable example.</li>
+<li>Differentiate leaky bucket and token bucket in at least five points.</li>
+<li>How does traffic shaping differ from traffic policing?</li>
+<li>Why can shaping increase delay? Does it always prevent packet loss?</li>
+<li>A token bucket has accumulated tokens during an idle period. Explain how this affects a later burst.</li>
+<li>Can traffic shaping increase the capacity of a physical link? Justify.</li>
+</ol>
+<h3>Quick answer checks</h3>
+<ul><li><b>Q1:</b> Regulates rate/pattern; smooths bursts and helps conform to a traffic profile.</li><li><b>Q2:</b> Finite queue drains at configured rate; overflow can drop packets.</li><li><b>Q3:</b> Tokens accumulate at a configured rate; packets use tokens; stored tokens allow bounded bursts.</li><li><b>Q4:</b> Compare mechanism, burst handling, output pattern, long-term control and buffer/storage behavior.</li><li><b>Q5:</b> Shaping generally queues/delays; policing checks conformance and may drop or mark excess traffic.</li><li><b>Q6:</b> Packets wait in a queue; a full buffer can still cause loss.</li><li><b>Q7:</b> Stored tokens can authorize a limited burst.</li><li><b>Q8:</b> No; it regulates packet timing, not physical capacity.</li></ul>
+</section><section><h2>12. One-minute revision</h2>
+<table><tbody>
+<tr><th>Traffic shaping</th><td>Controls packet rate and timing; smooths bursts.</td></tr>
+<tr><th>Leaky bucket</th><td>Finite packet queue + configured drain rate → steadier output.</td></tr>
+<tr><th>Token bucket</th><td>Tokens generated at a rate; bucket capacity permits a bounded burst.</td></tr>
+<tr><th>Shaping trade-off</th><td>More predictable traffic in exchange for possible queueing delay.</td></tr>
+<tr><th>Do not confuse</th><td>Shaping delays/queues; policing checks conformance and may drop/mark.</td></tr>
+<tr><th>Core limitation</th><td>Cannot create extra link bandwidth; finite queues can overflow.</td></tr>
+</tbody></table>
+<div class="callout good"><b>Recall cue:</b> “Leaky = smooth drain; Token = saved tokens allow bursts.”</div>
+</section><footer>CN visual notes • Topic 18 • Examples are illustrative; check the exact terminology and emphasis against your course PPT and official syllabus.</footer></div>
+<section class="card source-note" id="ppt-source-details"><h2>📘 SLA, policing and the two buckets</h2>
+<ul><li>Data traffic is bursty; bursts can fill buffers and cause packet loss. Shaping regulates average rate and burstiness at the network edge.</li><li>The customer and provider can agree on a traffic pattern in a <strong>Service Level Agreement (SLA)</strong>. If traffic follows that pattern, the provider promises timely delivery under the agreement.</li><li>Excess packets may be dropped or marked for lower priority. The PPT calls monitoring whether a flow complies with the agreed profile <strong>traffic policing</strong>.</li><li><strong>Leaky bucket:</strong> variable input is stored and emitted at a fixed rate; when the bucket is full, excess input cannot be stored.</li><li><strong>Token bucket:</strong> the PPT describes it as more flexible than a leaky bucket because it can allow bursts instead of forcing a constant output rate at all times. Consult the original token-bucket diagram for the exact token accounting depiction.</li></ul></section>
+</main></body></html>

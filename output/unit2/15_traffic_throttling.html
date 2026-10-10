@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en"><head><meta name="unit2-source-audit" content="Source-faithful additions"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Traffic Throttling | Computer Networks Unit 2</title><style>
+:root{--ink:#172033;--muted:#526078;--line:#dbe3ef;--paper:#f4f7fb;--blue:#1d4ed8;--pale:#eff6ff;--teal:#0f766e;--amber:#b45309}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.68 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+main{max-width:1050px;margin:auto;padding:28px 20px 64px}.hero{padding:34px 36px;border-radius:24px;background:linear-gradient(135deg,#e0f2fe,#eef2ff 60%,#f0fdfa);border:1px solid #cbdcf4;margin-bottom:22px}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;font-weight:800;color:var(--blue)}h1{font-size:clamp(2.1rem,5vw,3.3rem);line-height:1.1;margin:.2em 0}.lead{font-size:1.15rem;max-width:800px;color:#34435c}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chips span{padding:5px 11px;border:1px solid #bfdbfe;background:#fff;border-radius:999px;font-size:.83rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 30px;margin:18px 0;box-shadow:0 5px 18px #0f172a08}h2{font-size:1.55rem;margin-top:0;border-bottom:1px solid var(--line);padding-bottom:10px}h3{font-size:1.12rem;margin:1.25em 0 .35em}p{margin:.65em 0}li{margin:.38em 0}.diagram{margin:18px auto;max-width:780px;overflow-x:auto}.diagram svg{display:block;width:100%;height:auto;min-width:470px}.callout{background:var(--pale);border-left:4px solid var(--blue);padding:13px 16px;margin:18px 0;border-radius:8px}.warning{background:#fffbeb;border-left:4px solid #d97706;padding:13px 16px;margin:18px 0;border-radius:8px}.note{color:var(--muted);font-size:.92rem;background:#f8fafc;padding:11px 13px;border-radius:8px}.formula{font-family:ui-monospace,Consolas,monospace;background:#eff6ff;padding:14px;border-radius:10px;text-align:center;font-size:1.05rem;color:#1e40af}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#eff6ff}tr:nth-child(even) td{background:#fafcff}code{background:#eef2ff;padding:2px 5px;border-radius:4px}.exam{border-top:5px solid var(--teal)}details{border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin:10px 0}summary{cursor:pointer;font-weight:700}.revision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.revision-grid div{display:flex;flex-direction:column;gap:4px;padding:13px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.revision-grid span{color:var(--muted);font-size:.93rem}.source-note{background:#fbfdff}@media(max-width:650px){main{padding:12px}.hero,.card{padding:22px 18px}table{font-size:.85rem}th,td{padding:8px}}
+</style></head>
+<body><main>
+<section class="hero">
+ <p class="eyebrow">COMPUTER NETWORKS · UNIT 2 · TOPIC 15</p>
+ <h1>Traffic Throttling</h1>
+ <p class="lead">Regulating the rate at which traffic enters or passes through a network to reduce overload and help keep resource use within acceptable limits.</p>
+ <div class="chips"><span>Congestion management</span><span>Rate regulation</span><span>Traffic bursts</span><span>Exam-ready notes</span></div>
+</section>
+
+<section class="card">
+ <h2>1. What is traffic throttling?</h2>
+ <p><strong>Traffic throttling</strong> is the deliberate limiting or regulation of a traffic flow's sending or forwarding rate. It may be used when a source sends faster than the network or service can handle, or when traffic must comply with a configured rate or service policy.</p>
+ <div class="callout"><strong>Core idea:</strong> Control how quickly packets are injected into the network so that offered load does not overwhelm available resources.</div>
+ <p>Depending on the system, throttling may be triggered by congestion feedback or applied according to a configured policy. It can limit a sender's rate, restrict a flow at an edge device, or regulate traffic at another point in the network.</p>
+</section>
+
+<section class="card">
+ <h2>2. Visual working</h2>
+ <div class="diagram">
+<svg viewBox="0 0 760 310" role="img" aria-label="Traffic throttling reduces the rate of packets entering a congested network">
+ <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker></defs>
+ <rect x="20" y="100" width="155" height="78" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+ <text x="97" y="130" text-anchor="middle" font-family="Arial" font-size="15" font-weight="bold" fill="#1e3a8a">Traffic source</text><text x="97" y="151" text-anchor="middle" font-family="Arial" font-size="12" fill="#1e3a8a">High send rate</text>
+ <path d="M175 139 H255" stroke="#64748b" stroke-width="3" marker-end="url(#arr)"/>
+ <rect x="265" y="92" width="190" height="94" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+ <text x="360" y="121" text-anchor="middle" font-family="Arial" font-size="15" font-weight="bold" fill="#92400e">Rate control</text><text x="360" y="143" text-anchor="middle" font-family="Arial" font-size="13" fill="#92400e">Throttle / shape</text><text x="360" y="163" text-anchor="middle" font-family="Arial" font-size="12" fill="#92400e">limit burst or rate</text>
+ <path d="M455 139 H535" stroke="#64748b" stroke-width="3" marker-end="url(#arr)"/>
+ <rect x="545" y="100" width="190" height="78" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+ <text x="640" y="130" text-anchor="middle" font-family="Arial" font-size="15" font-weight="bold" fill="#166534">Network</text><text x="640" y="151" text-anchor="middle" font-family="Arial" font-size="12" fill="#166534">Controlled input rate</text>
+ <path d="M360 186 V232 H170" stroke="#64748b" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+ <text x="250" y="255" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">May use feedback or a configured traffic policy</text>
+ <text x="380" y="294" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">Conceptual diagram — specific throttling mechanisms vary</text>
+</svg>
+</div>
+ <ol>
+  <li>Traffic is generated by a source or application.</li>
+  <li>A rate-control mechanism observes or enforces a traffic limit.</li>
+  <li>If the flow exceeds the allowed rate, packets may be delayed, paced, marked, or otherwise managed according to the mechanism.</li>
+  <li>The controlled traffic enters the network at a rate intended to reduce overload or meet policy requirements.</li>
+ </ol>
+ <p class="note">The exact behaviour depends on the mechanism. Throttling does not always mean dropping packets: some mechanisms delay or pace packets, while others may reject or discard excess traffic.</p>
+</section>
+
+<section class="card">
+ <h2>3. Why is throttling needed?</h2>
+ <ul>
+  <li><strong>Prevent overload:</strong> reduce excessive traffic offered to a bottleneck.</li>
+  <li><strong>Control bursts:</strong> prevent short bursts from overflowing queues.</li>
+  <li><strong>Fair resource use:</strong> enforce per-flow or per-user limits where required.</li>
+  <li><strong>Policy compliance:</strong> keep traffic within an agreed or configured rate.</li>
+  <li><strong>Protect service quality:</strong> reduce the risk that one flow consumes resources needed by other flows.</li>
+ </ul>
+</section>
+
+<section class="card">
+ <h2>4. Simple rate example</h2>
+ <p>Suppose a service policy limits a flow to <strong>4 Mb/s</strong>, but the source attempts to send at <strong>7 Mb/s</strong>.</p>
+ <table><thead><tr><th>Item</th><th>Rate</th><th>Interpretation</th></tr></thead><tbody>
+ <tr><td>Source's offered rate</td><td>7 Mb/s</td><td>Traffic the sender tries to inject</td></tr>
+ <tr><td>Configured limit</td><td>4 Mb/s</td><td>Maximum permitted rate under this example policy</td></tr>
+ <tr><td>Excess offered rate</td><td>3 Mb/s</td><td>Difference between offered rate and the configured limit</td></tr>
+ </tbody></table>
+ <p>The throttling mechanism must handle the excess according to its design—for example, pace packets over time, queue them, mark them, or drop excess traffic if the policy requires it.</p>
+ <div class="formula">Excess offered rate = offered rate − permitted rate<br>7 Mb/s − 4 Mb/s = 3 Mb/s</div>
+ <p class="note">This arithmetic illustrates rates only. It does not imply that every throttling mechanism handles the excess in the same way.</p>
+</section>
+
+<section class="card">
+ <h2>5. Traffic throttling and traffic shaping</h2>
+ <p>These terms are related, but it is useful to distinguish their emphasis for study.</p>
+ <table><thead><tr><th>Aspect</th><th>Traffic throttling</th><th>Traffic shaping</th></tr></thead><tbody>
+ <tr><td>Emphasis</td><td>Limit or reduce the rate of a flow.</td><td>Regulate the pattern of traffic over time, often by smoothing bursts to conform to a traffic profile.</td></tr>
+ <tr><td>Typical behaviour</td><td>Enforce a rate ceiling; depending on implementation, may slow, queue, mark, or drop excess traffic.</td><td>Often buffers and delays packets so output conforms to a configured rate or burst allowance.</td></tr>
+ <tr><td>Purpose</td><td>Reduce excessive load or enforce policy.</td><td>Control average rate and burstiness and help meet traffic-profile requirements.</td></tr>
+ </tbody></table>
+ <p class="note">Terminology varies by textbook and implementation. A course may describe throttling as one of the mechanisms used to regulate traffic; use the exact distinction made in your PPT if it differs.</p>
+</section>
+
+<section class="card">
+ <h2>6. Advantages and limitations</h2>
+ <h3>Advantages</h3>
+ <ul><li>Can reduce overload at bottlenecks.</li><li>Helps enforce traffic-rate policies.</li><li>Can limit bursts that would otherwise build large queues.</li><li>May help share resources more predictably across flows.</li></ul>
+ <h3>Limitations</h3>
+ <ul><li>Excessive throttling can reduce application throughput or increase completion time.</li><li>Queued packets may experience additional delay.</li><li>Dropping excess packets can cause loss and possible retransmissions.</li><li>A fixed rate limit may not respond well to changing network conditions unless adapted appropriately.</li></ul>
+</section>
+
+<section class="card exam">
+ <h2>7. Exam-ready answers</h2>
+ <h3>3-mark answer: Define traffic throttling.</h3>
+ <p>Traffic throttling is the deliberate regulation or limitation of a traffic flow's sending or forwarding rate. It helps prevent excessive offered load, enforce rate policies, and reduce the risk of congestion at network bottlenecks.</p>
+ <h3>5-mark answer: Explain the working of traffic throttling.</h3>
+ <p>A traffic source generates packets and a rate-control mechanism enforces a permitted rate or reacts to congestion information. If the offered traffic exceeds the allowed rate, the mechanism controls the excess according to its design—for example, by pacing or delaying packets, queueing them, marking them, or dropping them. The controlled traffic is then forwarded at a rate intended to reduce overload or meet the configured policy.</p>
+ <h3>8–10-mark answer: Explain traffic throttling with an example.</h3>
+ <p>Define traffic throttling and explain why it is needed: overload prevention, burst control, policy compliance, and protection of shared resources. Draw a diagram showing a high-rate source passing through a rate-control mechanism before entering the network. Explain the processing steps and use the example of a 7 Mb/s offered rate with a 4 Mb/s configured limit. Discuss advantages and limitations, and briefly distinguish throttling from traffic shaping according to the terminology used in the course.</p>
+</section>
+
+<section class="card">
+ <h2>8. Question bank</h2>
+ <details open><summary>Short-answer questions</summary><ol>
+  <li>Define traffic throttling.</li><li>Why is traffic throttling used?</li><li>What is meant by a permitted traffic rate?</li><li>Does throttling always drop packets? Explain briefly.</li>
+ </ol></details>
+ <details><summary>5-mark questions</summary><ol>
+  <li>Explain traffic throttling with a neat diagram.</li><li>Explain how throttling can help reduce congestion.</li><li>Differentiate traffic throttling and traffic shaping.</li>
+ </ol></details>
+ <details><summary>8–10-mark questions</summary><ol>
+  <li>Discuss the working, advantages, and limitations of traffic throttling.</li><li>Explain traffic throttling with a suitable rate example and diagram.</li>
+ </ol></details>
+</section>
+
+<section class="card">
+ <h2>9. Quick revision</h2>
+ <div class="revision-grid">
+  <div><strong>Meaning</strong><span>Regulate or limit a flow's rate</span></div>
+  <div><strong>Inputs</strong><span>Offered traffic, configured limit, or congestion feedback</span></div>
+  <div><strong>Excess handling</strong><span>May pace, queue, mark, or drop, depending on design</span></div>
+  <div><strong>Goals</strong><span>Reduce overload, control bursts, enforce policy</span></div>
+  <div><strong>Risk</strong><span>Too much limiting can increase delay or reduce throughput</span></div>
+  <div><strong>Related topic</strong><span>Traffic shaping regulates traffic patterns over time</span></div>
+ </div>
+ <h3>Self-check</h3>
+ <ol><li>Can you define throttling in one or two sentences?</li><li>Can you explain the rate example?</li><li>Can you list three ways excess traffic might be handled?</li><li>Can you compare throttling and shaping?</li></ol>
+</section>
+
+<section class="card source-note">
+ <h2>Source and scope note</h2>
+ <p>This page covers traffic throttling as a Unit 2 congestion-management topic. The diagram and rate values are illustrative examples, not claims about exact values or diagrams in the lecture PPT. If the course slides define throttling more narrowly or prescribe a particular mechanism, prioritize that source-specific terminology for the exam.</p>
+</section>
+
+<footer style="text-align:center;color:#64748b;padding:24px 0">Computer Networks · Unit 2 · Traffic Throttling</footer>
+
+<section class="card source-note" id="ppt-source-details"><h2>📘 Feedback mechanisms from the lecture</h2>
+<h3>What a router can monitor</h3><ul><li>Output-link utilization.</li><li>Queue length or buffer occupancy.</li><li>Packet loss caused by insufficient buffer space.</li><li><strong>Queueing delay</strong>, emphasized in the PPT as especially useful because it can rise sharply during bursts.</li></ul><p>Feedback should arrive in time to help, and the network needs to identify the traffic sources responsible for congestion.</p>
+<h3>Choke packets, ECN and hop-by-hop backpressure</h3><ul><li><strong>Choke packet:</strong> a router selects a packet and sends a warning to its source naming the destination; the source reduces traffic to that destination by <strong>50%</strong> in the lecture example.</li><li><strong>Explicit Congestion Notification (ECN):</strong> instead of generating a separate warning packet, a router marks the packet. The receiver then informs the sender in its reply; the PPT says two IP-header bits record congestion experience.</li><li><strong>Hop-by-hop backpressure:</strong> a distant signal takes time to reach the source, so packets may keep arriving. Applying the choke effect at each hop can relieve the congested point more quickly.</li></ul></section>
+</main></body></html>

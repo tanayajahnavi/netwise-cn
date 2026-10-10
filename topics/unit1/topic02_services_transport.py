@@ -1,0 +1,349 @@
+from pathlib import Path
+
+# ============================================================
+# JSSSTU 24CS510 - COMPUTER NETWORKS
+# UNIT 1, TOPIC 2
+# SERVICES PROVIDED TO THE TRANSPORT LAYER
+# ============================================================
+# Run from the CN-Notes project root:
+#   python topics\unit1\topic02_services_transport.py
+# Output:
+#   output/unit1/02_services_provided_to_transport_layer.html
+#
+# Scope:
+#   - Based on the uploaded Unit-01 PPT and 24CS510 syllabus.
+#   - Covers the three design goals explicitly listed in the PPT.
+#   - Connectionless and connection-oriented service mechanisms
+#     are treated as separate upcoming topics, not duplicated here.
+# ============================================================
+
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+OUTPUT_DIR = ROOT / "output" / "unit1"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_FILE = OUTPUT_DIR / "02_services_provided_to_transport_layer.html"
+
+html = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services Provided to the Transport Layer | JSSSTU 24CS510</title>
+<style>
+:root {
+  --background:#f4f7fb; --surface:#fff; --text:#172033; --muted:#5e6b82;
+  --primary:#2457d6; --primary-light:#eaf0ff; --border:#dce3ee;
+  --green:#15803d; --green-light:#ecfdf3; --orange:#b45309;
+  --orange-light:#fff7ed; --red:#b91c1c; --red-light:#fef2f2;
+  --teal:#0f766e; --teal-light:#e6fffb;
+}
+* {box-sizing:border-box}
+html {scroll-behavior:smooth}
+body {margin:0;background:var(--background);color:var(--text);font-family:"Segoe UI",Arial,sans-serif;line-height:1.72}
+.container {width:min(1080px,92%);margin:0 auto}
+.hero {background:linear-gradient(135deg,#172554,#2457d6 72%,#0f766e);color:#fff;padding:48px 0}
+.hero h1 {max-width:900px;font-size:clamp(2rem,5vw,3.15rem);line-height:1.16;margin:15px 0}
+.hero p {max-width:820px;color:#e0e7ff;font-size:1.04rem}
+.badge {display:inline-block;padding:5px 12px;border-radius:20px;font-size:.83rem;font-weight:800;background:#dbeafe;color:#1e40af}
+.hero .badge {background:rgba(255,255,255,.18);color:white;border:1px solid rgba(255,255,255,.25)}
+.meta {display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.meta span {border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);padding:5px 10px;border-radius:20px;font-size:.82rem}
+main {padding:26px 0 60px}
+.toc {background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:22px}
+.toc strong {display:block;margin-bottom:8px}
+.toc a {display:inline-block;margin:0 14px 5px 0;color:var(--primary);text-decoration:none}
+.toc a:hover {text-decoration:underline}
+section {background:var(--surface);padding:clamp(20px,3vw,30px);margin:22px 0;border:1px solid var(--border);border-radius:16px;box-shadow:0 5px 18px rgba(30,50,90,.04);scroll-margin-top:15px}
+h2 {color:#193b8c;margin-top:0;line-height:1.35}
+h3 {color:#244b9b;margin-top:22px}
+.definition,.note,.success,.warning,.tealbox {padding:16px 18px;border-radius:9px;margin:15px 0}
+.definition {border-left:5px solid var(--primary);background:var(--primary-light)}
+.note {border-left:5px solid var(--orange);background:var(--orange-light)}
+.success {border-left:5px solid var(--green);background:var(--green-light)}
+.warning {border-left:5px solid var(--red);background:var(--red-light)}
+.tealbox {border-left:5px solid var(--teal);background:var(--teal-light)}
+.grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.mini {border:1px solid var(--border);border-radius:12px;padding:16px;background:#fcfdff}
+.mini h3 {margin:0 0 7px}
+.diagram {overflow-x:auto;margin:20px 0;padding:12px;background:#fbfdff;border:1px solid var(--border);border-radius:12px}
+svg {display:block;width:100%;height:auto;min-width:620px}
+.caption {text-align:center;color:var(--muted);font-size:.9rem}
+.table-wrap {overflow-x:auto}
+table {border-collapse:collapse;width:100%;margin:16px 0}
+th,td {padding:12px;border:1px solid var(--border);text-align:left;vertical-align:top}
+th {background:var(--primary-light);color:#193b8c}
+tr:nth-child(even) td {background:#fbfcff}
+.steps {counter-reset:step;list-style:none;padding:0}
+.steps li {counter-increment:step;position:relative;padding:13px 15px 13px 55px;margin:12px 0;border:1px solid var(--border);border-radius:10px;background:#fcfdff}
+.steps li:before {content:counter(step);position:absolute;left:14px;top:13px;width:27px;height:27px;display:grid;place-items:center;border-radius:50%;color:white;background:var(--primary);font-weight:bold}
+.answer {border:1px solid #b9c9ee;background:#fbfcff;padding:22px;border-radius:12px;margin-top:16px}
+.marks {display:inline-block;background:#dbeafe;color:#1e40af;padding:4px 10px;border-radius:6px;font-weight:bold}
+.question {border:1px solid var(--border);border-radius:12px;padding:18px;margin:15px 0}
+.question h3 {margin-top:0}
+.tag {display:inline-block;font-size:.75rem;font-weight:800;border-radius:5px;padding:4px 8px;margin-right:7px;vertical-align:2px}
+.past {background:#ffedd5;color:#9a3412}.practice {background:#eaf0ff;color:#1e40af}.short {background:#dcfce7;color:#166534}
+.answer-label {display:block;color:var(--teal);font-weight:800;margin-top:10px}
+.formula {background:#172554;color:white;padding:14px 18px;border-radius:10px;font-family:Consolas,monospace;overflow-x:auto}
+.revision li {margin:8px 0}
+.footer {text-align:center;color:var(--muted);padding:25px 0}
+details {border:1px solid var(--border);border-radius:9px;padding:13px 16px;background:#fcfdff}
+summary {cursor:pointer;font-weight:700;color:#193b8c}
+@media print {
+ body {background:white;font-size:11pt}
+ .hero {background:white;color:black;padding:20px 0}
+ .hero p {color:black}
+ section,.toc {box-shadow:none;break-inside:avoid;border:1px solid #ccc}
+ .container {width:100%}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="container">
+  <span class="badge">JSSSTU • 24CS510 • UNIT 1</span>
+  <h1>Services Provided to the Transport Layer</h1>
+  <p>Visual notes on the network-layer/transport-layer interface, why network services must be designed carefully, and the three design goals explicitly listed in the Unit-01 lecture slides.</p>
+  <div class="meta"><span>Topic 02</span><span>Definitions + diagram</span><span>Exam-ready answers</span><span>Practice questions</span></div>
+</div>
+</header>
+<main class="container">
+<nav class="toc">
+<strong>On this page</strong>
+<a href="#scope">Syllabus status</a><a href="#overview">Layer interface</a><a href="#goals">Three design goals</a>
+<a href="#diagram">Diagram</a><a href="#example">Example</a><a href="#exam">Exam answers</a><a href="#questions">Question bank</a><a href="#revision">Revision</a>
+</nav>
+
+<section id="scope">
+<h2>1. Syllabus and source status</h2>
+<div class="success"><strong>Syllabus status:</strong> “Services provided to the Transport Layer” is explicitly listed under Network Layer Design Issues in Unit 1 of JSSSTU course 24CS510.</div>
+<p><strong>Primary source:</strong> Uploaded Unit-01 PPT, slide titled “Services Provided to the Transport Layer” (slide 6 in the uploaded deck).</p>
+<p>The slide explicitly lists three goals for designing the services. These are the core examinable points covered in this page.</p>
+<div class="note"><strong>Scope boundary:</strong> Implementation of Connectionless Service and Implementation of Connection-Oriented Service are separate syllabus topics. They are referenced only to explain context; their full mechanisms belong in the next topic pages.</div>
+</section>
+
+<section id="overview">
+<h2>2. What does the network layer provide?</h2>
+<div class="definition"><strong>Core idea:</strong> The network layer provides services to the transport layer through the network-layer/transport-layer interface. The transport layer uses these services to communicate with a destination host across an interconnected network.</div>
+<p>The network layer handles the movement of packets across networks. The transport layer is concerned with communication between application processes and relies on the network layer to carry data between hosts.</p>
+<div class="diagram">
+<svg viewBox="0 0 900 300" role="img" aria-label="Transport layer uses the network layer service to communicate across routers">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2457d6"/></marker></defs>
+<rect x="30" y="25" width="245" height="70" rx="12" fill="#eaf0ff" stroke="#2457d6" stroke-width="2"/>
+<text x="152" y="53" text-anchor="middle" font-size="18" font-weight="700" fill="#193b8c">Source host</text>
+<text x="152" y="76" text-anchor="middle" font-size="14" fill="#334155">Transport layer</text>
+<rect x="30" y="115" width="245" height="70" rx="12" fill="#e6fffb" stroke="#0f766e" stroke-width="2"/>
+<text x="152" y="143" text-anchor="middle" font-size="18" font-weight="700" fill="#115e59">Network layer</text>
+<text x="152" y="166" text-anchor="middle" font-size="14" fill="#334155">Provides network service</text>
+<line x1="152" y1="95" x2="152" y2="108" stroke="#2457d6" stroke-width="2" marker-end="url(#arr)"/>
+<line x1="275" y1="150" x2="620" y2="150" stroke="#2457d6" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="360" y="105" width="170" height="90" rx="12" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+<text x="445" y="135" text-anchor="middle" font-size="17" font-weight="700" fill="#92400e">Network</text>
+<text x="445" y="157" text-anchor="middle" font-size="17" font-weight="700" fill="#92400e">routers / links</text>
+<text x="445" y="179" text-anchor="middle" font-size="13" fill="#78350f">Underlying network</text>
+<rect x="625" y="25" width="245" height="70" rx="12" fill="#eaf0ff" stroke="#2457d6" stroke-width="2"/>
+<text x="747" y="53" text-anchor="middle" font-size="18" font-weight="700" fill="#193b8c">Destination host</text>
+<text x="747" y="76" text-anchor="middle" font-size="14" fill="#334155">Transport layer</text>
+<rect x="625" y="115" width="245" height="70" rx="12" fill="#e6fffb" stroke="#0f766e" stroke-width="2"/>
+<text x="747" y="143" text-anchor="middle" font-size="18" font-weight="700" fill="#115e59">Network layer</text>
+<text x="747" y="166" text-anchor="middle" font-size="14" fill="#334155">Receives network data</text>
+<path d="M747 185 V218 H152 V185" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="450" y="246" text-anchor="middle" font-size="15" fill="#526174">The network layer hides internal forwarding details from transport.</text>
+<text x="450" y="270" text-anchor="middle" font-size="13" fill="#64748b">Conceptual service view — not a packet-format diagram</text>
+</svg>
+</div>
+<p class="caption">Figure 1: Conceptual view of the service boundary. The network layer transports data across the network; the transport layer should not need to understand the internal router arrangement.</p>
+<h3>Why does the interface matter?</h3>
+<ul>
+<li>It defines what the network layer offers to the transport layer.</li>
+<li>It separates transport-layer logic from the network's internal implementation.</li>
+<li>It provides a consistent way for the transport layer to address destinations.</li>
+</ul>
+</section>
+
+<section id="goals">
+<h2>3. Three design goals listed in the PPT</h2>
+<div class="grid">
+<div class="mini"><h3>🎯 Goal 1: Technology independence</h3><p><strong>Statement:</strong> Services should be independent of router technology.</p><p><strong>Meaning:</strong> The service offered upward should not change merely because the underlying routers or network equipment use a different technology.</p><p><strong>Exam keyword:</strong> Independent of router technology.</p></div>
+<div class="mini"><h3>🛡️ Goal 2: Hide internal topology</h3><p><strong>Statement:</strong> The transport layer should be shielded from the number, type and topology of routers present.</p><p><strong>Meaning:</strong> The transport layer should not have to know how many routers exist, what kinds they are, or how they are interconnected.</p><p><strong>Exam keyword:</strong> Shielded from router details.</p></div>
+<div class="mini"><h3>🔢 Goal 3: Uniform addressing</h3><p><strong>Statement:</strong> Network addresses made available to the transport layer should use a uniform numbering plan, even across LANs and WANs.</p><p><strong>Meaning:</strong> Addressing should remain consistent when communication crosses different kinds of networks.</p><p><strong>Exam keyword:</strong> Uniform numbering plan across LANs and WANs.</p></div>
+</div>
+<h3>Comparison table for revision</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Design goal</th><th>What it avoids</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Independence from router technology</td><td>Transport-layer dependence on a particular router implementation</td><td>Different network technologies can provide the same service interface.</td></tr>
+<tr><td>Shielding from router number, type and topology</td><td>Transport logic needing to track the internal layout of the network</td><td>Internal routing and network changes can occur without changing transport-layer logic.</td></tr>
+<tr><td>Uniform network addressing</td><td>Different incompatible addressing plans across LANs and WANs</td><td>The transport layer can use a consistent way to identify network destinations.</td></tr>
+</tbody></table></div>
+<div class="note"><strong>Answer-writing tip:</strong> For a question asking for the design goals, state all three goals explicitly, then add one sentence explaining each. Do not replace the PPT's terminology with vague phrases.</div>
+</section>
+
+<section id="diagram">
+<h2>4. Memory diagram: the three goals</h2>
+<div class="diagram">
+<svg viewBox="0 0 900 320" role="img" aria-label="Three design goals for network services to the transport layer">
+<rect x="250" y="15" width="400" height="55" rx="12" fill="#172554"/>
+<text x="450" y="49" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">Network-layer service interface</text>
+<path d="M450 70 V95 H150 V120 M450 95 V120 M450 95 H750 V120" fill="none" stroke="#64748b" stroke-width="2"/>
+<rect x="15" y="120" width="270" height="135" rx="14" fill="#eaf0ff" stroke="#2457d6" stroke-width="2"/>
+<text x="150" y="154" text-anchor="middle" font-size="17" font-weight="700" fill="#193b8c">1. Technology independent</text>
+<text x="150" y="184" text-anchor="middle" font-size="14" fill="#334155">Not tied to one type</text>
+<text x="150" y="205" text-anchor="middle" font-size="14" fill="#334155">of router technology</text>
+<rect x="315" y="120" width="270" height="135" rx="14" fill="#e6fffb" stroke="#0f766e" stroke-width="2"/>
+<text x="450" y="154" text-anchor="middle" font-size="17" font-weight="700" fill="#115e59">2. Hide router details</text>
+<text x="450" y="184" text-anchor="middle" font-size="14" fill="#334155">Number, type and</text>
+<text x="450" y="205" text-anchor="middle" font-size="14" fill="#334155">topology are hidden</text>
+<rect x="615" y="120" width="270" height="135" rx="14" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+<text x="750" y="154" text-anchor="middle" font-size="17" font-weight="700" fill="#92400e">3. Uniform addressing</text>
+<text x="750" y="184" text-anchor="middle" font-size="14" fill="#334155">Consistent numbering</text>
+<text x="750" y="205" text-anchor="middle" font-size="14" fill="#334155">across LANs and WANs</text>
+<text x="450" y="292" text-anchor="middle" font-size="15" fill="#526174">Remember: Technology • Topology • Uniform numbering</text>
+</svg>
+</div>
+<div class="success"><strong>Recall mnemonic:</strong> <em>TTU</em> — <strong>T</strong>echnology independent, hide router <strong>T</strong>opology/details, <strong>U</strong>niform addressing.</div>
+</section>
+
+<section id="example">
+<h2>5. Simple example to understand the goals</h2>
+<p>Suppose a transport-layer process sends data from a host on one LAN to a host reachable through a WAN and another LAN.</p>
+<ol class="steps">
+<li><strong>Technology independence:</strong> The network may contain routers or links built using different technologies. The transport layer should use the network service rather than depend on each device's implementation.</li>
+<li><strong>Hide topology:</strong> The transport layer should not need to know whether the path crosses two routers or ten routers, or how those routers are connected.</li>
+<li><strong>Uniform addressing:</strong> The destination should be represented using a consistent network-addressing plan, even when the route crosses LANs and WANs.</li>
+</ol>
+<div class="warning"><strong>Scope note:</strong> This is an illustrative example of the three stated goals. It is not a specific scenario quoted from the lecture slide.</div>
+</section>
+
+<section id="exam">
+<h2>6. Exam-ready answers</h2>
+<div class="answer">
+<span class="marks">3 MARKS</span>
+<h3>Q1. What is meant by services provided to the Transport Layer?</h3>
+<p>The network layer provides services to the transport layer through the network-layer/transport-layer interface. These services allow the transport layer to use network communication without depending on the internal implementation of the routers and links.</p>
+</div>
+<div class="answer">
+<span class="marks">5 MARKS</span>
+<h3>Q2. State and explain the design goals for services provided by the network layer to the transport layer.</h3>
+<p>The services provided by the network layer to the transport layer should be designed with the following goals:</p>
+<ol>
+<li><strong>Independence from router technology:</strong> The service should not depend on the technology used by the routers.</li>
+<li><strong>Shielding from router details:</strong> The transport layer should be shielded from the number, type and topology of routers in the network.</li>
+<li><strong>Uniform addressing:</strong> Network addresses made available to the transport layer should follow a uniform numbering plan across LANs and WANs.</li>
+</ol>
+<p>These goals provide a consistent service interface and separate transport-layer operation from the internal details of the network.</p>
+</div>
+<div class="answer">
+<span class="marks">5 MARKS</span>
+<h3>Q3. Why should the network layer hide router technology and topology from the transport layer?</h3>
+<p>The transport layer should use the service provided by the network layer rather than depend on the network's internal implementation. Hiding router technology and topology means that changes in router type, router count or network arrangement do not need to be exposed to the transport layer. This preserves separation between layers and makes the service interface more consistent.</p>
+</div>
+<div class="answer">
+<span class="marks">8–10 MARKS</span>
+<h3>Q4. Explain the network-layer/transport-layer service interface and its design goals with a diagram.</h3>
+<p><strong>Introduction:</strong> The network layer provides services to the transport layer through the network-layer/transport-layer interface. The transport layer uses these services to communicate across interconnected networks.</p>
+<p><strong>Diagram:</strong> Draw the source host with transport and network layers, the network containing routers and links, and the destination host with corresponding layers. Label the network-layer/transport-layer interface.</p>
+<p><strong>Design goals:</strong></p>
+<ol>
+<li>Services should be independent of router technology.</li>
+<li>The transport layer should be shielded from the number, type and topology of routers.</li>
+<li>Network addresses supplied to the transport layer should use a uniform numbering plan across LANs and WANs.</li>
+</ol>
+<p><strong>Conclusion:</strong> These goals define a consistent service boundary and prevent the transport layer from depending on the internal organization of the network.</p>
+<div class="note">The uploaded slide gives these goals but does not prescribe a fixed 8–10 mark answer. Expand the explanation and diagram to match the wording and marks of the question.</div>
+</div>
+</section>
+
+<section id="questions">
+<h2>7. Possible questions with answers</h2>
+<p class="caption">These are practice questions derived from the slide's stated content, not verified past-paper questions.</p>
+<article class="question">
+<h3><span class="tag short">SHORT</span>Q1. Name the interface through which the network layer provides services to the transport layer.</h3>
+<span class="answer-label">Answer</span>
+<p>The network-layer/transport-layer interface.</p>
+</article>
+<article class="question">
+<h3><span class="tag practice">PRACTICE</span>Q2. List the three design goals for network-layer services.</h3>
+<span class="answer-label">Answer</span>
+<ol><li>Services should be independent of router technology.</li><li>The transport layer should be shielded from the number, type and topology of routers.</li><li>Network addresses should use a uniform numbering plan across LANs and WANs.</li></ol>
+</article>
+<article class="question">
+<h3><span class="tag practice">PRACTICE</span>Q3. What does it mean for a network service to be independent of router technology?</h3>
+<span class="answer-label">Answer</span>
+<p>The service offered to the transport layer should not depend on the particular technology used to implement routers.</p>
+</article>
+<article class="question">
+<h3><span class="tag practice">PRACTICE</span>Q4. What router details should be hidden from the transport layer?</h3>
+<span class="answer-label">Answer</span>
+<p>The number, type and topology of routers present in the network.</p>
+</article>
+<article class="question">
+<h3><span class="tag practice">PRACTICE</span>Q5. Why is a uniform numbering plan required across LANs and WANs?</h3>
+<span class="answer-label">Answer</span>
+<p>A uniform numbering plan gives the transport layer a consistent network-addressing scheme across different kinds of networks, instead of requiring it to handle incompatible addressing plans for each network type.</p>
+</article>
+<article class="question">
+<h3><span class="tag practice">PRACTICE</span>Q6. Explain the importance of the network-layer/transport-layer interface.</h3>
+<span class="answer-label">Answer</span>
+<p>It defines the services the network layer offers to the transport layer. A carefully designed interface allows transport-layer operation to remain independent of router technology and internal topology while using a consistent addressing plan.</p>
+</article>
+<article class="question">
+<h3><span class="tag practice">PRACTICE</span>Q7. A network path changes from three routers to six routers. Which design goal says the transport layer should be shielded from this detail?</h3>
+<span class="answer-label">Answer</span>
+<p>The goal that the transport layer should be shielded from the number, type and topology of routers present.</p>
+</article>
+</section>
+
+<section id="revision">
+<h2>8. Quick revision and self-test</h2>
+<div class="grid">
+<div class="mini"><h3>🔌 Interface</h3><p>Network-layer/transport-layer interface.</p></div>
+<div class="mini"><h3>🧩 Technology</h3><p>Service independent of router technology.</p></div>
+<div class="mini"><h3>🗺️ Topology</h3><p>Hide number, type and topology of routers.</p></div>
+<div class="mini"><h3>🔢 Addressing</h3><p>Uniform numbering plan across LANs and WANs.</p></div>
+</div>
+<h3>Self-test</h3>
+<ol>
+<li>What are the three design goals listed in the PPT?</li>
+<li>What does “shielded from router topology” mean?</li>
+<li>Why should addresses follow a uniform numbering plan?</li>
+<li>Which interface connects the network layer's service to the transport layer?</li>
+</ol>
+<details><summary>Show short answers</summary>
+<ol>
+<li>Technology independence; hide router number/type/topology; uniform addressing across LANs and WANs.</li>
+<li>The transport layer need not know the number, type or interconnection arrangement of routers.</li>
+<li>To provide consistent addressing across different network types.</li>
+<li>The network-layer/transport-layer interface.</li>
+</ol>
+</details>
+<h3>Exam checklist</h3>
+<ul>
+<li>☐ Definition and interface</li>
+<li>☐ All three design goals in the PPT's terminology</li>
+<li>☐ Explain each goal in one or two sentences</li>
+<li>☐ Draw and label the conceptual layer diagram for longer answers</li>
+</ul>
+</section>
+
+<section>
+<h2>9. Source and accuracy notes</h2>
+<ul>
+<li><strong>Primary source:</strong> Uploaded Unit-01 PPT, slide 6, “Services Provided to the Transport Layer”.</li>
+<li><strong>Syllabus:</strong> JSSSTU 24CS510, Unit 1, Network Layer Design Issues.</li>
+<li><strong>Source-supported details:</strong> The three design goals are directly listed in the PPT.</li>
+<li><strong>Explanatory additions:</strong> The diagrams, examples, answer formats and practice questions are study aids based on those goals.</li>
+<li><strong>Past-paper status:</strong> The uploaded 20CS520 paper was used for the previous topic. No claim is made here that these questions appeared in that paper.</li>
+</ul>
+<div class="success"><strong>Topic complete:</strong> Learn the three goals in the same order and retain the exact PPT phrases for exam answers.</div>
+</section>
+</main>
+<footer class="footer"><div class="container">JSSSTU • 24CS510 • Computer Networks • Unit 1 — Topic 2</div></footer>
+</body>
+</html>
+"""
+
+OUTPUT_FILE.write_text(html, encoding="utf-8")
+print("Topic page generated successfully!")
+print(f"Output: {OUTPUT_FILE.resolve()}")
+print("Open the HTML file in your browser.")

@@ -1,0 +1,66 @@
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / "output" / "unit2" / "24_unit2_revision_and_coverage.html"
+OUT.parent.mkdir(parents=True, exist_ok=True)
+
+CSS = """
+:root{--ink:#19243a;--muted:#5c6880;--line:#dbe3ef;--blue:#2559a5;--pale:#edf3ff;--green:#eaf8ef;--amber:#fff5dc;--red:#fff0ed}
+*{box-sizing:border-box}body{margin:0;background:#f3f6fb;color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(135deg,#14284b,#2c65ac);color:white;padding:38px max(20px,calc((100% - 1000px)/2))}header p{color:#e1ebff;max-width:850px}
+main{max-width:1000px;margin:24px auto;padding:0 18px 48px}section{background:white;border:1px solid var(--line);border-radius:15px;padding:22px;margin:17px 0;box-shadow:0 3px 12px #16264708}
+h1{font-size:clamp(2rem,4vw,3rem);line-height:1.12;margin:.4em 0}h2{color:#214e91;margin-top:0}h3{margin-bottom:5px}.tag{display:inline-block;border:1px solid #9dbcf0;border-radius:30px;padding:4px 10px;font-size:.82rem}
+.callout{background:var(--pale);border-left:4px solid var(--blue);padding:13px 16px;border-radius:8px;margin:13px 0}.good{background:var(--green);padding:12px;border-radius:8px}.warn{background:var(--amber);padding:12px;border-radius:8px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.94rem}th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#edf3fc}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.card{border:1px solid var(--line);padding:14px;border-radius:10px}.marks{background:#f0fbf4;border-left:4px solid #2c8b57;padding:13px 16px;border-radius:8px;margin:12px 0}.q{padding:12px 0;border-bottom:1px solid var(--line)}.answer{color:#246343;font-weight:600}.muted{color:var(--muted)}footer{text-align:center;color:var(--muted);padding:20px}
+@media(max-width:650px){section{padding:16px}table{display:block;overflow-x:auto}}
+"""
+def sec(title, body):
+    return f"<section><h2>{title}</h2>{body}</section>"
+
+page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Topic 24 — Unit 2 Revision & Coverage Checklist</title><style>{CSS}</style></head><body>
+<header><span class="tag">COMPUTER NETWORKS · UNIT 2</span><h1>24. Unit 2 Consolidated Revision</h1><p>A final revision map connecting the generated topic notes, key comparisons, numerical practice, and a syllabus coverage checklist.</p></header><main>
+<div class="callout"><strong>Important:</strong> This is a consolidation page based on the Unit 2 topic sequence established in this notes project. It is not a substitute for checking the official syllabus and prescribed PPTs. Mark a topic “confirmed” only after comparing it with those source materials.</div>
+{sec("1. Topic coverage checklist", """<p>Use this table to track whether you have studied each topic and verified it against your official syllabus/PPT.</p><table><thead><tr><th>Topic</th><th>Notes page</th><th>Revision status</th></tr></thead><tbody>
+<tr><td>Congestion control fundamentals / approaches</td><td>12_congestion_control_fundamentals.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Traffic-aware routing</td><td>13_traffic_aware_routing.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Admission control</td><td>14_admission_control.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Traffic throttling</td><td>15_traffic_throttling.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Load shedding</td><td>16_load_shedding.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>QoS application requirements</td><td>17_qos_application_requirements.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Traffic shaping</td><td>18_traffic_shaping.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Packet scheduling</td><td>19_packet_scheduling.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Integrated Services (IntServ)</td><td>20_integrated_services.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Differentiated Services (DiffServ)</td><td>21_differentiated_services.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Tunneling</td><td>22_tunneling.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+<tr><td>Packet fragmentation</td><td>23_packet_fragmentation.html</td><td>☐ Study ☐ Verify against PPT</td></tr>
+</tbody></table><p class="muted">The filenames reflect this project’s generated sequence; confirm the official syllabus wording and identify any missing subtopics before treating the unit as complete.</p>""")}
+{sec("2. Congestion control: the big picture", """<div class="grid"><div class="card"><h3>Prevent overload</h3><p>Admission control; traffic-aware routing; traffic shaping; traffic throttling.</p></div><div class="card"><h3>Manage overload</h3><p>Load shedding and congestion-control feedback mechanisms.</p></div><div class="card"><h3>Allocate service</h3><p>Packet scheduling and QoS architectures such as IntServ and DiffServ.</p></div></div><p>These mechanisms are related but not interchangeable. A useful answer states the problem each mechanism addresses and when it is applied.</p>""")}
+{sec("3. Must-know comparison table", """<table><thead><tr><th>Mechanism</th><th>Main purpose</th><th>Quick distinction</th></tr></thead><tbody>
+<tr><td>Traffic-aware routing</td><td>Choose routes while considering traffic conditions.</td><td>Changes route selection.</td></tr>
+<tr><td>Admission control</td><td>Decide whether a new flow/request can be accepted.</td><td>Accept/reject before committing resources.</td></tr>
+<tr><td>Traffic throttling</td><td>Limit or reduce the rate of traffic entering or traversing a network.</td><td>Rate restriction.</td></tr>
+<tr><td>Load shedding</td><td>Discard selected packets when resources are overloaded.</td><td>Drop traffic to keep the system operating.</td></tr>
+<tr><td>Traffic shaping</td><td>Regulate packet transmission rate and burstiness.</td><td>Delay/buffer or regulate traffic to fit a profile.</td></tr>
+<tr><td>Packet scheduling</td><td>Choose which queued packet is transmitted next.</td><td>Controls service order among queues/packets.</td></tr>
+<tr><td>IntServ</td><td>Support QoS through per-flow resource management.</td><td>Reservation and admission control.</td></tr>
+<tr><td>DiffServ</td><td>Provide differentiated treatment to traffic classes.</td><td>Class-based marking and per-hop behaviour.</td></tr>
+<tr><td>Tunneling</td><td>Carry an inner packet through an intermediate network.</td><td>Encapsulation and decapsulation.</td></tr>
+<tr><td>Fragmentation</td><td>Split a packet to fit a link MTU when permitted.</td><td>Multiple fragments are reassembled at destination.</td></tr>
+</tbody></table>""")}
+{sec("4. QoS metrics and application needs", """<table><thead><tr><th>Metric</th><th>Meaning</th><th>Why it matters</th></tr></thead><tbody><tr><td>Bandwidth</td><td>Available or allocated link capacity.</td><td>Supports the volume of traffic an application sends.</td></tr><tr><td>Throughput</td><td>Rate of successfully delivered data.</td><td>Shows the effective data rate.</td></tr><tr><td>Delay / latency</td><td>Time taken for a packet to reach its destination.</td><td>Important for interactive applications.</td></tr><tr><td>Jitter</td><td>Variation in packet delay.</td><td>Can affect real-time audio/video smoothness.</td></tr><tr><td>Packet loss</td><td>Packets that fail to reach the receiver.</td><td>Can degrade media quality or require retransmission.</td></tr></tbody></table><p>For a short exam answer, define the metric and connect it to one application example. Avoid claiming universal numeric thresholds unless your course material specifies them.</p>""")}
+{sec("5. Numerical practice checklist", """<ul><li><strong>Traffic shaping:</strong> be able to explain token bucket and leaky bucket; identify how burst traffic is handled.</li><li><strong>Admission control:</strong> calculate remaining capacity and decide whether a new request fits the stated policy.</li><li><strong>Load shedding:</strong> distinguish offered arrivals, service capacity, buffered packets, and actual drops.</li><li><strong>Packet fragmentation:</strong> subtract the IP header from total length, calculate fragment payloads, and express offsets in 8-byte units.</li></ul><div class="warn"><strong>Calculation habit:</strong> write assumptions and units before calculating. Do not infer dropped packet count from arrival rate minus service capacity unless the question states the time interval and buffer behaviour.</div>""")}
+{sec("6. Diagram practice", """<ol><li>Draw a congestion queue growing in front of a bottleneck link.</li><li>Draw the traffic-shaping flow: bursty input → shaper/bucket → regulated output.</li><li>Draw packet scheduling: separate queues → scheduler → output link.</li><li>Draw IntServ reservation: request → admission check → accept/reject → resource handling.</li><li>Draw DiffServ: ingress classification/marking → core routers apply PHB → egress.</li><li>Draw tunneling: inner packet → encapsulation → tunnel network → decapsulation.</li><li>Draw fragmentation: oversized datagram → smaller fragments → destination reassembly.</li></ol><p class="muted">Use labels, arrows, and a one-line explanation under each diagram. Keep the diagram consistent with the exact model taught in class.</p>""")}
+{sec("7. Short-answer self-test", """<div class="q"><strong>Q1. How does admission control differ from load shedding?</strong><p class="answer">Admission control decides whether to accept a new request; load shedding discards selected packets during overload.</p></div>
+<div class="q"><strong>Q2. How do shaping and scheduling differ?</strong><p class="answer">Shaping regulates when/rate traffic enters the network; scheduling decides which queued packet is transmitted next.</p></div>
+<div class="q"><strong>Q3. What is the main distinction between IntServ and DiffServ?</strong><p class="answer">IntServ typically manages resources per flow; DiffServ applies treatment to traffic classes/aggregates.</p></div>
+<div class="q"><strong>Q4. Does tunneling inherently encrypt packets?</strong><p class="answer">No. Tunneling encapsulates packets; encryption requires a separate security mechanism.</p></div>
+<div class="q"><strong>Q5. What does the IPv4 Fragment Offset measure?</strong><p class="answer">The fragment payload's position in the original payload, in units of 8 bytes.</p></div>
+<div class="q"><strong>Q6. Why can per-flow reservation be difficult at large scale?</strong><p class="answer">It requires routers to maintain and manage state for many individual flows.</p></div>
+<div class="q"><strong>Q7. What does a packet scheduler determine?</strong><p class="answer">Which queued packet or traffic queue gets served next.</p></div>""")}
+{sec("8. Suggested 60-minute revision plan", """<table><thead><tr><th>Time</th><th>Task</th></tr></thead><tbody><tr><td>0–10 min</td><td>Revise congestion causes and the major control approaches.</td></tr><tr><td>10–20 min</td><td>Practise differences: admission control, throttling, shedding, shaping.</td></tr><tr><td>20–30 min</td><td>Revise QoS metrics, application needs, and packet scheduling.</td></tr><tr><td>30–40 min</td><td>Compare IntServ and DiffServ; draw each architecture.</td></tr><tr><td>40–50 min</td><td>Draw tunneling and fragmentation; practise the fragmentation calculation.</td></tr><tr><td>50–60 min</td><td>Answer the self-test without looking, then verify against the PPT.</td></tr></tbody></table>""")}
+{sec("9. Before declaring Unit 2 complete", """<ul><li>☐ Compare every listed syllabus topic with the official syllabus wording.</li><li>☐ Check every prescribed PPT slide for additional subtopics, diagrams, algorithms, and worked examples.</li><li>☐ Keep self-learning and term-work items separate if your syllabus labels them that way.</li><li>☐ Practise at least one long answer and one labelled diagram for each major topic.</li><li>☐ Check technical definitions and numerical assumptions against the prescribed source.</li><li>☐ Revise the exact question-paper wording and marks pattern if available.</li></ul><div class="good"><strong>Best next step:</strong> use the official Unit 2 PPT and syllabus for a strict line-by-line audit. This page is a revision companion, not proof that every examinable slide has been covered.</div>""")}
+</main><footer>CN Notes · Unit 2 · Topic 24 — Consolidated Revision & Coverage Checklist</footer></body></html>"""
+
+OUT.write_text(page, encoding="utf-8")
+print(f"Created: {OUT}")
