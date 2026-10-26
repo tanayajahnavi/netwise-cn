@@ -1,0 +1,166 @@
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / "output" / "unit2" / "16_load_shedding.html"
+OUT.parent.mkdir(parents=True, exist_ok=True)
+
+CSS = r"""
+:root{--ink:#172033;--muted:#526078;--line:#dbe3ef;--paper:#f4f7fb;--blue:#1d4ed8;--pale:#eff6ff;--teal:#0f766e;--amber:#b45309}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.68 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+main{max-width:1050px;margin:auto;padding:28px 20px 64px}.hero{padding:34px 36px;border-radius:24px;background:linear-gradient(135deg,#e0f2fe,#eef2ff 60%,#f0fdfa);border:1px solid #cbdcf4;margin-bottom:22px}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;font-weight:800;color:var(--blue)}h1{font-size:clamp(2.1rem,5vw,3.3rem);line-height:1.1;margin:.2em 0}.lead{font-size:1.15rem;max-width:800px;color:#34435c}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chips span{padding:5px 11px;border:1px solid #bfdbfe;background:#fff;border-radius:999px;font-size:.83rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 30px;margin:18px 0;box-shadow:0 5px 18px #0f172a08}h2{font-size:1.55rem;margin-top:0;border-bottom:1px solid var(--line);padding-bottom:10px}h3{font-size:1.12rem;margin:1.25em 0 .35em}p{margin:.65em 0}li{margin:.38em 0}.diagram{margin:18px auto;max-width:780px;overflow-x:auto}.diagram svg{display:block;width:100%;height:auto;min-width:470px}.callout{background:var(--pale);border-left:4px solid var(--blue);padding:13px 16px;margin:18px 0;border-radius:8px}.warning{background:#fffbeb;border-left:4px solid #d97706;padding:13px 16px;margin:18px 0;border-radius:8px}.note{color:var(--muted);font-size:.92rem;background:#f8fafc;padding:11px 13px;border-radius:8px}.formula{font-family:ui-monospace,Consolas,monospace;background:#eff6ff;padding:14px;border-radius:10px;text-align:center;font-size:1.05rem;color:#1e40af}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#eff6ff}tr:nth-child(even) td{background:#fafcff}code{background:#eef2ff;padding:2px 5px;border-radius:4px}.exam{border-top:5px solid var(--teal)}details{border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin:10px 0}summary{cursor:pointer;font-weight:700}.revision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.revision-grid div{display:flex;flex-direction:column;gap:4px;padding:13px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.revision-grid span{color:var(--muted);font-size:.93rem}.source-note{background:#fbfdff}@media(max-width:650px){main{padding:12px}.hero,.card{padding:22px 18px}table{font-size:.85rem}th,td{padding:8px}}
+"""
+
+SVG = r"""
+<svg viewBox="0 0 760 320" role="img" aria-label="Router buffer fills during overload, and load shedding drops selected packets">
+ <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker></defs>
+ <rect x="20" y="110" width="145" height="76" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+ <text x="92" y="140" text-anchor="middle" font-family="Arial" font-size="15" font-weight="bold" fill="#1e3a8a">Incoming</text><text x="92" y="160" text-anchor="middle" font-family="Arial" font-size="13" fill="#1e3a8a">high traffic</text>
+ <path d="M165 148 H235" stroke="#64748b" stroke-width="3" marker-end="url(#arr)"/>
+ <rect x="245" y="85" width="205" height="126" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+ <text x="347" y="111" text-anchor="middle" font-family="Arial" font-size="15" font-weight="bold" fill="#92400e">Router buffer</text>
+ <g fill="#fbbf24" stroke="#b45309"><rect x="265" y="128" width="30" height="26" rx="4"/><rect x="301" y="128" width="30" height="26" rx="4"/><rect x="337" y="128" width="30" height="26" rx="4"/><rect x="373" y="128" width="30" height="26" rx="4"/><rect x="409" y="128" width="25" height="26" rx="4"/></g>
+ <text x="347" y="178" text-anchor="middle" font-family="Arial" font-size="12" fill="#92400e">Near / at capacity</text>
+ <path d="M450 148 H520" stroke="#64748b" stroke-width="3" marker-end="url(#arr)"/>
+ <rect x="530" y="110" width="205" height="76" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+ <text x="632" y="140" text-anchor="middle" font-family="Arial" font-size="15" font-weight="bold" fill="#166534">Output link</text><text x="632" y="160" text-anchor="middle" font-family="Arial" font-size="13" fill="#166534">limited service rate</text>
+ <path d="M347 211 V248 H195" stroke="#dc2626" stroke-width="2.5" fill="none"/><path d="M195 248 l10 -6 v12 z" fill="#dc2626"/>
+ <text x="190" y="273" text-anchor="middle" font-family="Arial" font-size="13" fill="#b91c1c">Selected packets dropped</text>
+ <text x="480" y="285" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">Conceptual diagram — packet-selection policy varies</text>
+</svg>
+"""
+
+content = r"""
+<section class="hero">
+ <p class="eyebrow">COMPUTER NETWORKS · UNIT 2 · TOPIC 16</p>
+ <h1>Load Shedding</h1>
+ <p class="lead">Discarding selected packets when a network device or path is overloaded, so that remaining traffic can be handled with the resources available.</p>
+ <div class="chips"><span>Congestion management</span><span>Packet dropping</span><span>Overload response</span><span>Exam-ready notes</span></div>
+</section>
+
+<section class="card">
+ <h2>1. What is load shedding?</h2>
+ <p><strong>Load shedding</strong> is a congestion-management technique in which a router or other network component deliberately discards some packets when it cannot handle all offered traffic. It is used to prevent overload from consuming all available buffer or processing resources.</p>
+ <div class="callout"><strong>Core idea:</strong> When all incoming packets cannot be served, discard selected packets according to a policy rather than allowing the device to become completely overwhelmed.</div>
+ <p>Load shedding is generally a response to severe load or resource shortage. It does not increase link capacity; it decides which traffic will not be carried when demand exceeds what can be served.</p>
+</section>
+
+<section class="card">
+ <h2>2. Visual working</h2>
+ <div class="diagram">__SVG__</div>
+ <ol>
+  <li>Traffic arrives at a router faster than it can be processed or transmitted.</li>
+  <li>The queue grows and buffer space becomes scarce.</li>
+  <li>The device applies a packet-discard policy.</li>
+  <li>Selected packets are dropped, reducing the amount of traffic that must be stored or processed.</li>
+  <li>The remaining packets continue through the network, subject to the available capacity.</li>
+ </ol>
+ <p class="note">Dropping packets may cause retransmissions or application-level loss. Load shedding is therefore an overload-management trade-off, not a way to make lost data disappear without consequences.</p>
+</section>
+
+<section class="card">
+ <h2>3. Why is load shedding used?</h2>
+ <ul>
+  <li><strong>Protect finite buffers:</strong> router memory for queued packets is limited.</li>
+  <li><strong>Prevent resource exhaustion:</strong> an overloaded device may not be able to handle every packet.</li>
+  <li><strong>Preserve useful service:</strong> a suitable policy may prioritize packets or flows that are more important.</li>
+  <li><strong>Reduce overload pressure:</strong> fewer packets need to be queued or processed.</li>
+ </ul>
+</section>
+
+<section class="card">
+ <h2>4. Common packet-selection policies</h2>
+ <p>When shedding is required, a system needs a rule for deciding which packets to discard. The precise policies depend on the network and traffic type.</p>
+ <table><thead><tr><th>Policy / approach</th><th>Basic idea</th><th>Potential use or trade-off</th></tr></thead><tbody>
+ <tr><td>Tail drop</td><td>Drop newly arriving packets when the queue is full.</td><td>Simple to implement, but may discard bursts of packets and does not explicitly distinguish traffic importance.</td></tr>
+ <tr><td>Priority-based dropping</td><td>Discard lower-priority packets before higher-priority packets.</td><td>Can protect important traffic, but low-priority traffic may suffer more loss.</td></tr>
+ <tr><td>Class- or flow-aware shedding</td><td>Apply a policy based on traffic class, flow, or application significance.</td><td>Can align packet loss with service goals, but requires classification and policy configuration.</td></tr>
+ <tr><td>Random / probabilistic dropping</td><td>Drop packets according to a probability or queue-management algorithm.</td><td>Can avoid treating only the latest packet as the candidate for every drop; exact behaviour depends on the algorithm.</td></tr>
+ </tbody></table>
+ <p class="note">Tail drop is a common queue-overflow behaviour; the other rows describe general policy families. Do not assume all are listed as formal load-shedding categories in your lecturer's PPT unless shown there.</p>
+</section>
+
+<section class="card">
+ <h2>5. Simple example</h2>
+ <p>A router can transmit 100 packets per time interval, but 140 packets arrive during that interval. If the queue cannot hold the excess and no additional capacity is available, the router cannot deliver every packet in that interval.</p>
+ <table><thead><tr><th>Quantity</th><th>Packets per interval</th></tr></thead><tbody>
+ <tr><td>Packets arriving</td><td>140</td></tr>
+ <tr><td>Packets that can be served in the interval</td><td>100</td></tr>
+ <tr><td>Excess demand relative to immediate service capacity</td><td>40</td></tr>
+ </tbody></table>
+ <p>The 40-packet difference is not automatically equal to the number dropped: a buffer may hold some packets for later service. If there is no remaining buffer space and the offered load persists, packets must be dropped or otherwise prevented from entering.</p>
+ <div class="warning"><strong>Important:</strong> Do not calculate packet loss as simply “arrivals − service capacity” unless the question explicitly says there is no queue space and asks about that interval. Queuing changes how many packets are actually dropped.</div>
+</section>
+
+<section class="card">
+ <h2>6. Advantages and disadvantages</h2>
+ <h3>Advantages</h3>
+ <ul><li>Helps a device cope with overload when resources are finite.</li><li>Can protect higher-priority or more useful traffic if the policy supports differentiation.</li><li>Prevents unbounded queue growth where buffering is limited.</li></ul>
+ <h3>Disadvantages</h3>
+ <ul><li>Causes packet loss and may require retransmission.</li><li>Can harm applications that require reliable delivery or continuous media if packets are discarded carelessly.</li><li>A poor policy may drop important traffic or unfairly penalize certain flows.</li><li>It treats the symptom of overload; capacity planning and other congestion-control mechanisms may still be needed.</li></ul>
+</section>
+
+<section class="card">
+ <h2>7. Load shedding vs. traffic throttling</h2>
+ <table><thead><tr><th>Aspect</th><th>Load shedding</th><th>Traffic throttling</th></tr></thead><tbody>
+ <tr><td>Main action</td><td>Discard selected packets when the system cannot handle all traffic.</td><td>Limit or regulate the rate at which traffic is offered or forwarded.</td></tr>
+ <tr><td>Packet handling</td><td>Selected packets are dropped.</td><td>Depending on the mechanism, excess packets may be paced, delayed, queued, marked, or dropped.</td></tr>
+ <tr><td>Emphasis</td><td>Manage overload by deciding what not to carry.</td><td>Reduce or control the rate of offered traffic.</td></tr>
+ </tbody></table>
+</section>
+
+<section class="card exam">
+ <h2>8. Exam-ready answers</h2>
+ <h3>3-mark answer: Define load shedding.</h3>
+ <p>Load shedding is a congestion-management technique in which a network device deliberately discards selected packets when offered traffic exceeds its available processing, transmission, or buffering resources. It helps the device cope with overload but causes packet loss.</p>
+ <h3>5-mark answer: Explain load shedding.</h3>
+ <p>When packets arrive faster than a router can process or transmit them, its queue grows and buffer space may become exhausted. The router applies a packet-discard policy to shed some traffic. The policy may be based on arrival order, priority, traffic class, or another configured rule. Dropping packets reduces the amount of traffic that must be stored or processed, but can cause loss and retransmissions.</p>
+ <h3>8–10-mark answer: Explain load shedding with a diagram, policies, and limitations.</h3>
+ <p>Define load shedding and explain the overload condition. Draw a diagram showing incoming traffic, a nearly full router buffer, the output link, and packets being discarded. Describe the steps from queue growth to packet selection and dropping. Explain relevant packet-selection policies such as tail drop and priority-based dropping if included in the course material. Conclude with benefits, packet-loss consequences, and the need for complementary congestion-management techniques.</p>
+</section>
+
+<section class="card">
+ <h2>9. Question bank</h2>
+ <details open><summary>Short-answer questions</summary><ol>
+  <li>Define load shedding.</li><li>Why is load shedding required?</li><li>What is tail drop?</li><li>State two disadvantages of load shedding.</li>
+ </ol></details>
+ <details><summary>5-mark questions</summary><ol>
+  <li>Explain load shedding with a neat diagram.</li><li>Describe packet-selection policies for load shedding.</li><li>Differentiate load shedding and traffic throttling.</li>
+ </ol></details>
+ <details><summary>8–10-mark questions</summary><ol>
+  <li>Discuss the operation, policies, advantages, and disadvantages of load shedding.</li><li>Explain how a router may respond when packet arrivals exceed its service capacity.</li>
+ </ol></details>
+</section>
+
+<section class="card">
+ <h2>10. Quick revision</h2>
+ <div class="revision-grid">
+  <div><strong>Trigger</strong><span>Offered load exceeds available resources</span></div>
+  <div><strong>Action</strong><span>Discard selected packets</span></div>
+  <div><strong>Policy examples</strong><span>Tail drop, priority-based or class-aware dropping</span></div>
+  <div><strong>Benefit</strong><span>Helps the device handle overload</span></div>
+  <div><strong>Cost</strong><span>Packet loss and possible retransmissions</span></div>
+  <div><strong>Contrast</strong><span>Throttling regulates rate; shedding drops packets</span></div>
+ </div>
+ <h3>Self-check</h3>
+ <ol><li>Can you define load shedding and explain when it is used?</li><li>Can you draw the buffer-overload diagram?</li><li>Can you explain tail drop and priority-based dropping?</li><li>Can you distinguish shedding from throttling?</li></ol>
+</section>
+
+<section class="card source-note">
+ <h2>Source and scope note</h2>
+ <p>This page covers load shedding as a Unit 2 congestion-management topic. The diagram and packet-count example are illustrative. Packet-discard policies can differ across textbooks and systems; prioritize the exact categories and terminology provided in your course PPT.</p>
+</section>
+"""
+
+html = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Load Shedding | Computer Networks Unit 2</title><style>""" + CSS + """</style></head>
+<body><main>""" + content.replace("__SVG__", SVG) + """
+<footer style="text-align:center;color:#64748b;padding:24px 0">Computer Networks · Unit 2 · Load Shedding</footer>
+</main></body></html>"""
+
+OUT.write_text(html, encoding="utf-8")
+print(f"Created: {OUT}")
+print(f"HTML size: {OUT.stat().st_size:,} bytes")

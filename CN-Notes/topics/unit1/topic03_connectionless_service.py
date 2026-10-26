@@ -1,0 +1,172 @@
+from pathlib import Path
+
+# Topic 03 — generated standalone visual HTML notes
+# Place this file at: CN-Notes/topics/unit1/topic03_connectionless_service.py
+# Run from anywhere; the output is anchored to the CN-Notes project root.
+ROOT = Path(__file__).resolve().parents[2]
+OUTPUT_DIR = ROOT / "output" / "unit1"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_FILE = OUTPUT_DIR / "03_implementation_of_connectionless_service.html"
+
+html = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topic 03 — Implementation of Connectionless Service | CN 24CS510</title>
+<style>
+:root{--ink:#172033;--muted:#586579;--blue:#2457d6;--teal:#0f766e;--bg:#f3f6fb;--card:#fff;--line:#dce4ef;--soft:#eaf0ff;--green:#e8f8ef;--amber:#fff4dc;--red:#fff0ed}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.68 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.hero{background:linear-gradient(125deg,#142b63,#2457d6 65%,#0f766e);color:white;padding:42px 20px 35px}.wrap{max-width:1080px;margin:auto;padding:0 18px}.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.15;margin:12px 0}.hero p{max-width:800px;color:#e3ebff}.badge,.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-size:.78rem;font-weight:800;letter-spacing:.02em}.badge{background:#ffffff20;border:1px solid #ffffff50}.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.meta span{background:#ffffff18;border:1px solid #ffffff35;border-radius:8px;padding:5px 10px;font-size:.82rem}
+main{padding:22px 0 48px}.toc,section{background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:0 5px 18px #1c2d4a0a;margin:0 0 18px;padding:22px}.toc{display:flex;flex-wrap:wrap;gap:10px 18px}.toc strong{width:100%}.toc a{color:var(--blue);text-decoration:none;font-weight:650;font-size:.93rem}.toc a:hover{text-decoration:underline}
+h2{font-size:1.45rem;line-height:1.3;margin:0 0 14px}h3{font-size:1.08rem;margin:20px 0 8px;color:#193b8c}p{margin:9px 0}ul,ol{padding-left:24px}li{margin:6px 0}
+.callout,.definition,.note,.success,.warning{border-radius:10px;padding:13px 16px;margin:13px 0;border-left:4px solid var(--blue);background:var(--soft)}.definition{background:#e6fffb;border-color:var(--teal)}.success{background:var(--green);border-color:#16834a}.warning{background:var(--amber);border-color:#c17a00}.note{background:#f4f0ff;border-color:#7454c8}
+.diagram{border:1px solid var(--line);border-radius:12px;background:#fbfdff;padding:12px;margin:15px 0;overflow-x:auto}.diagram svg{display:block;max-width:100%;height:auto;margin:auto}.caption{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.mini{border:1px solid var(--line);border-radius:11px;padding:14px;background:#fff}.mini h3{margin:0 0 6px}.tag{display:inline-block;border-radius:6px;background:#eaf0ff;color:#1e40af;font-size:.75rem;font-weight:800;padding:3px 7px;margin-right:5px}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.94rem}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#eaf0ff;color:#193b8c}
+.answer{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}.answer h3{margin:0 0 7px}.marks{float:right;background:#e8f8ef;color:#166534;padding:2px 8px;border-radius:99px;font-size:.78rem}
+code{background:#edf2f7;border-radius:5px;padding:2px 5px}.revision{background:#172554;color:white;border-radius:12px;padding:17px 20px}.revision h3{color:#bfdbfe;margin-top:0}.revision li{margin:7px 0}
+details{border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin:10px 0;background:#fbfdff}summary{cursor:pointer;font-weight:750;color:#193b8c}.footer{text-align:center;color:var(--muted);padding:22px 0}
+@media(max-width:600px){.hero{padding:30px 0}.toc,section{padding:16px}.wrap{padding:0 12px}table{font-size:.86rem}th,td{padding:8px}}
+@media print{body{background:white;font-size:11pt}.hero{background:white;color:black;padding:10px 0}.hero p{color:#333}.toc{display:none}section{box-shadow:none;break-inside:avoid}.wrap{max-width:none}.answer,details{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<span class="badge">JSSSTU • 24CS510 • UNIT 1 • NETWORK LAYER</span>
+<h1>Implementation of Connectionless Service</h1>
+<p>Visual notes on datagram networks: how packets are sent independently, how routers forward them using destination-based tables, and why packets from one message can follow different paths.</p>
+<div class="meta"><span>Topic 03</span><span>Core PPT concepts</span><span>Diagram + flow</span><span>Exam answers + practice</span></div>
+</div></header>
+<main class="wrap">
+<nav class="toc"><strong>On this page</strong><a href="#scope">Syllabus status</a><a href="#concept">Core concept</a><a href="#working">How it works</a><a href="#routing">Routing table</a><a href="#example">Worked example</a><a href="#proscons">Features</a><a href="#exam">Exam answers</a><a href="#questions">Question bank</a><a href="#revision">Revision</a></nav>
+
+<section id="scope"><h2>1. Syllabus and source status</h2>
+<div class="success"><strong>Examinable syllabus topic:</strong> “Implementation of Connectionless Service” is explicitly listed under Network Layer Design Issues in Unit 1 of JSSSTU course 24CS510.</div>
+<p><strong>Primary source:</strong> Uploaded Unit-01 PPT. The slides state that packets are injected into the network individually and routed independently, without advance setup; these packets are commonly called <em>datagrams</em>, and the network is a <em>datagram network</em>.</p>
+<div class="note"><strong>Scope note:</strong> This page focuses on connectionless service and the PPT's “Routing with Datagram network” example. Connection-oriented service and the full datagram-versus-virtual-circuit comparison are separate topics in the notes sequence.</div>
+</section>
+
+<section id="concept"><h2>2. What is connectionless service?</h2>
+<div class="definition"><strong>Definition:</strong> In a connectionless network service, each packet is treated independently and routed toward its destination without establishing a connection in advance. Such packets are called <strong>datagrams</strong>, and the network is called a <strong>datagram network</strong>.</div>
+<p>Think of sending several postcards to the same address. Each postcard carries the destination information and can be routed independently. They may take different routes and may not arrive in the same order.</p>
+<div class="grid">
+<div class="mini"><h3>📨 No setup phase</h3><p>The sender can inject a packet into the network without first establishing a virtual circuit.</p></div>
+<div class="mini"><h3>🧭 Independent routing</h3><p>Routers make forwarding decisions for packets individually using the destination information and their forwarding tables.</p></div>
+<div class="mini"><h3>🗺️ Destination in packet</h3><p>In the Internet Protocol (IP) example from the PPT, each packet carries a destination IP address.</p></div>
+</div>
+<div class="diagram"><svg viewBox="0 0 850 270" role="img" aria-label="Three datagrams from source H1 to destination H2 follow independently selected paths">
+<defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#2457d6"/></marker></defs>
+<rect x="22" y="95" width="105" height="68" rx="12" fill="#eaf0ff" stroke="#2457d6" stroke-width="2"/><text x="74" y="124" text-anchor="middle" font-size="17" font-weight="700" fill="#193b8c">Host H1</text><text x="74" y="145" text-anchor="middle" font-size="12" fill="#334155">Source</text>
+<rect x="718" y="95" width="110" height="68" rx="12" fill="#e6fffb" stroke="#0f766e" stroke-width="2"/><text x="773" y="124" text-anchor="middle" font-size="17" font-weight="700" fill="#115e59">Host H2</text><text x="773" y="145" text-anchor="middle" font-size="12" fill="#334155">Destination</text>
+<g fill="#fff4dc" stroke="#c17a00" stroke-width="2"><circle cx="230" cy="55" r="26"/><circle cx="385" cy="55" r="26"/><circle cx="540" cy="55" r="26"/><circle cx="230" cy="135" r="26"/><circle cx="385" cy="135" r="26"/><circle cx="540" cy="135" r="26"/><circle cx="310" cy="220" r="26"/><circle cx="465" cy="220" r="26"/></g>
+<g fill="#7c4a03" font-size="14" font-weight="700" text-anchor="middle"><text x="230" y="60">A</text><text x="385" y="60">C</text><text x="540" y="60">E</text><text x="230" y="140">A</text><text x="385" y="140">B</text><text x="540" y="140">D</text><text x="310" y="225">B</text><text x="465" y="225">E</text></g>
+<g stroke="#2457d6" stroke-width="2.5" fill="none" marker-end="url(#arr)"><path d="M127 110 L204 66"/><path d="M256 55 L359 55"/><path d="M411 55 L514 55"/><path d="M566 66 L718 110"/><path d="M127 129 L204 135"/><path d="M256 135 L359 135"/><path d="M411 135 L514 135"/><path d="M566 135 L718 135"/><path d="M127 151 L284 208"/><path d="M336 220 L439 220"/><path d="M491 208 L718 151"/></g>
+<g font-size="12" font-weight="800" fill="#193b8c"><text x="150" y="72">P1</text><text x="150" y="119">P2</text><text x="150" y="181">P3</text></g>
+</svg><div class="caption">Conceptual illustration: datagrams for the same destination may use different routes. Router names and paths here are illustrative, not a reproduction of the slide's exact network diagram.</div></div>
+</section>
+
+<section id="working"><h2>3. How a datagram network works</h2>
+<ol>
+<li>The source process gives its message to the transport layer, specifying the destination process/host.</li>
+<li>The transport layer adds its header and passes the result to the network layer.</li>
+<li>If the message is longer than the maximum packet size, the network layer breaks it into packets.</li>
+<li>Each packet is sent independently. No advance connection setup is required.</li>
+<li>At each router, the destination information is checked against the router's forwarding table.</li>
+<li>The router selects an outgoing line/next hop and forwards the packet.</li>
+<li>Packets can travel along different paths if routing-table entries or network conditions differ.</li>
+</ol>
+<div class="diagram"><svg viewBox="0 0 850 160" role="img" aria-label="Flowchart of connectionless datagram forwarding">
+<defs><marker id="fa" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#2457d6"/></marker></defs>
+<g stroke="#2457d6" stroke-width="2" fill="#eaf0ff"><rect x="10" y="40" width="135" height="65" rx="10"/><rect x="180" y="40" width="135" height="65" rx="10"/><rect x="350" y="40" width="135" height="65" rx="10"/><rect x="520" y="40" width="135" height="65" rx="10"/><rect x="690" y="40" width="145" height="65" rx="10"/></g>
+<g fill="#193b8c" text-anchor="middle" font-size="13" font-weight="700"><text x="77" y="66">Source message</text><text x="77" y="85">+ transport header</text><text x="247" y="66">Divide into</text><text x="247" y="85">packets</text><text x="417" y="66">Send datagram</text><text x="417" y="85">independently</text><text x="587" y="66">Router looks up</text><text x="587" y="85">destination</text><text x="762" y="66">Forward to</text><text x="762" y="85">next hop / host</text></g>
+<g stroke="#2457d6" stroke-width="2" marker-end="url(#fa)"><line x1="145" y1="72" x2="176" y2="72"/><line x1="315" y1="72" x2="346" y2="72"/><line x1="485" y1="72" x2="516" y2="72"/><line x1="655" y1="72" x2="686" y2="72"/></g>
+</svg><div class="caption">Flowchart: message preparation and independent packet forwarding.</div></div>
+</section>
+
+<section id="routing"><h2>4. Router forwarding table</h2>
+<p>The PPT says every router has an internal table that tells it where to send packets for possible destinations. Each entry is a pair: <strong>destination → outgoing line</strong> (or next hop).</p>
+<table><thead><tr><th>Destination network</th><th>Outgoing line / next hop</th><th>Router's action</th></tr></thead><tbody>
+<tr><td>Network X</td><td>Line 1 → Router B</td><td>Forward packet toward B</td></tr>
+<tr><td>Network Y</td><td>Line 2 → Router C</td><td>Forward packet toward C</td></tr>
+<tr><td>Network Z</td><td>Line 3 → Router D</td><td>Forward packet toward D</td></tr>
+</tbody></table>
+<div class="warning"><strong>Important distinction:</strong> The table above is a simplified teaching example, not copied from the PPT. The PPT's core point is that each router uses a destination/outgoing-line entry to choose where to forward an arriving packet.</div>
+<h3>Routing vs. forwarding</h3>
+<ul><li><strong>Forwarding:</strong> the local action of sending a packet out through the selected interface/next hop.</li><li><strong>Routing:</strong> the network-layer process/algorithms that determine paths and help build or update forwarding information.</li></ul>
+</section>
+
+<section id="example"><h2>5. Worked example based on the PPT</h2>
+<p>The PPT describes a message from process P1 on host H1 to process P2 on host H2. Assume the message is four times longer than the maximum packet size, so the network layer divides it into four packets: 1, 2, 3 and 4.</p>
+<div class="grid">
+<div class="mini"><h3>Packets 1, 2 and 3</h3><p>In the PPT's example, these packets travel from router A through E and then F.</p></div>
+<div class="mini"><h3>Packet 4</h3><p>Packet 4 reaches router A but is forwarded through B instead, even though its destination is still F.</p></div>
+</div>
+<p>The PPT explains that router A has learned of a traffic jam somewhere along the A–C–E path and updated its routing table. Therefore, packet 4 takes a different route from the earlier packets.</p>
+<div class="diagram"><svg viewBox="0 0 850 250" role="img" aria-label="PPT-inspired routing example: packets 1 to 3 use A-E-F, packet 4 uses A-B-F">
+<defs><marker id="exarr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#2457d6"/></marker></defs>
+<g stroke="#2457d6" stroke-width="2" fill="#eaf0ff"><rect x="35" y="88" width="92" height="55" rx="10"/><rect x="210" y="88" width="92" height="55" rx="10"/><rect x="390" y="32" width="92" height="55" rx="10"/><rect x="570" y="32" width="92" height="55" rx="10"/><rect x="390" y="170" width="92" height="55" rx="10"/><rect x="750" y="88" width="75" height="55" rx="10"/></g>
+<g fill="#193b8c" font-size="16" font-weight="800" text-anchor="middle"><text x="81" y="121">H1</text><text x="256" y="121">A</text><text x="436" y="65">C</text><text x="616" y="65">E</text><text x="436" y="203">B</text><text x="787" y="121">F</text></g>
+<g stroke="#2457d6" stroke-width="3" fill="none" marker-end="url(#exarr)"><path d="M127 100 L210 100"/><path d="M302 98 L390 60"/><path d="M482 60 L570 60"/><path d="M662 60 L750 98"/><path d="M302 133 L390 195"/><path d="M482 195 L750 133"/></g>
+<g fill="#166534" font-size="13" font-weight="800"><text x="490" y="23">Packets 1, 2, 3</text></g><g fill="#9a3412" font-size="13" font-weight="800"><text x="494" y="222">Packet 4 (alternate route)</text></g>
+<text x="175" y="78" fill="#334155" font-size="12">Packets 1–4</text>
+</svg><div class="caption">Simplified conceptual drawing of the PPT's routing story. It illustrates the route change; it is not intended as a precise recreation of the original slide layout.</div></div>
+<div class="success"><strong>Exam takeaway:</strong> A datagram network does not promise that all packets belonging to one message will follow the same path. A router can forward packets for the same destination differently after its routing information changes.</div>
+</section>
+
+<section id="proscons"><h2>6. Characteristics, advantages and limitations</h2>
+<table><thead><tr><th>Aspect</th><th>Connectionless / datagram service</th></tr></thead><tbody>
+<tr><td>Setup</td><td>No advance connection setup is required.</td></tr>
+<tr><td>Packet treatment</td><td>Each packet is routed independently.</td></tr>
+<tr><td>Packet identity</td><td>Packets are called datagrams.</td></tr>
+<tr><td>Router decision</td><td>Uses destination information and forwarding-table entries.</td></tr>
+<tr><td>Path</td><td>Packets from the same message may take different routes.</td></tr>
+<tr><td>Adaptation</td><td>Routing-table changes can affect the path chosen by later packets.</td></tr>
+<tr><td>Ordering</td><td>Because paths may differ, packets may arrive out of order; the network-layer service itself does not guarantee a common path.</td></tr>
+</tbody></table>
+<div class="note"><strong>Source boundary:</strong> The first six rows follow or closely explain the uploaded PPT. Packet reordering is a standard implication of independent routing and is included as explanatory context, not as a direct quotation from the slide.</div>
+</section>
+
+<section id="exam"><h2>7. Exam-ready answers</h2>
+<div class="answer"><h3><span class="marks">3 marks</span>Define connectionless service.</h3><p>Connectionless service is a network-layer service in which packets are injected into the network individually and routed independently of one another. No advance connection setup is needed. The packets are called datagrams, and the network is called a datagram network.</p></div>
+<div class="answer"><h3><span class="marks">5 marks</span>Explain the implementation of connectionless service.</h3>
+<ol><li>In connectionless service, no connection is established before data transmission.</li><li>The source sends packets individually into the network; each packet is called a datagram.</li><li>Each datagram carries destination information used by routers to make forwarding decisions.</li><li>Every router maintains a forwarding table mapping destinations to outgoing lines or next hops.</li><li>Each arriving packet is forwarded independently, so packets from the same message may follow different routes if routing information changes.</li></ol>
+<p><strong>Draw:</strong> a source host, two alternative router paths, and a destination host. Label packets P1/P2 and show that they can take different paths.</p></div>
+<div class="answer"><h3><span class="marks">8–10 marks</span>Explain datagram routing with a suitable example.</h3>
+<p>A datagram network implements connectionless service by sending each packet independently without prior connection setup. A message from a source process is passed through the transport layer, which adds its header. The network layer splits a long message into packets if necessary. Each packet is forwarded by routers using destination-based forwarding-table entries.</p>
+<p>In the Unit-01 PPT example, a message from process P1 on H1 to P2 on H2 is divided into four packets. Packets 1, 2 and 3 are forwarded from router A through E to F. Packet 4 is instead forwarded from A through B because A has learned of congestion on the A–C–E path and updated its routing table. All packets still target F, but their paths differ.</p>
+<p>Thus, datagram networks require no advance setup, route packets independently, and allow forwarding decisions to change as routing information changes. <strong>Include a labelled route diagram</strong> to complete the answer.</p></div>
+</section>
+
+<section id="questions"><h2>8. Practice question bank</h2>
+<p><span class="tag">PPT-based</span> The questions below are practice prompts generated from the uploaded slides and the 24CS510 syllabus. They are not claimed to be exact past-paper questions unless explicitly identified as such.</p>
+<details><summary>Q1. What is a datagram network?</summary><p>A network that offers connectionless service in which packets are injected and routed independently, without advance connection setup.</p></details>
+<details><summary>Q2. Why is connectionless service called connectionless?</summary><p>Because the sender does not establish a connection or virtual circuit before sending packets. Each packet is handled independently.</p></details>
+<details><summary>Q3. What information does a router use to forward a datagram?</summary><p>The router examines destination information and consults its forwarding table, which maps destinations to outgoing lines or next hops.</p></details>
+<details><summary>Q4. Can packets belonging to the same message take different paths? Explain.</summary><p>Yes. Each packet is routed independently. If routing information changes, a later packet may be sent along another route. The PPT's packet 4 example illustrates this.</p></details>
+<details><summary>Q5. Explain the PPT's example of packets 1–4.</summary><p>The network layer divides a long message into four packets. Packets 1–3 travel A–E–F, while packet 4 travels A–B–F because router A updates its routing table after learning of congestion on the A–C–E path.</p></details>
+<details><summary>Q6. Differentiate routing and forwarding.</summary><p>Forwarding is the local act of sending an arriving packet through the chosen outgoing interface. Routing determines paths and creates or updates the information used for those forwarding decisions.</p></details>
+<details><summary>Q7. Name the Internet protocol example associated with connectionless service in the PPT.</summary><p>Internet Protocol (IP). The PPT states that each packet carries a destination IP address used by routers to forward packets individually.</p></details>
+</section>
+
+<section id="revision"><div class="revision"><h3>⚡ One-minute revision</h3><ul>
+<li><strong>Connectionless service → Datagram network.</strong></li>
+<li><strong>No advance setup</strong> is needed.</li>
+<li>Packets are injected individually and routed independently.</li>
+<li>Router table entry: <strong>destination → outgoing line/next hop</strong>.</li>
+<li>IP is the PPT's example; each packet carries a destination IP address.</li>
+<li>PPT example: packets 1–3 use A–E–F; packet 4 uses A–B–F after a routing-table change due to congestion on A–C–E.</li>
+<li>Exam diagram: show source, routers, alternative routes, destination, and packet labels.</li>
+</ul></div>
+<h3>Self-check 🧠</h3>
+<details><summary>1. Does a datagram network need a virtual circuit before sending?</summary><p><strong>No.</strong> No advance connection setup is needed.</p></details>
+<details><summary>2. What is the usual router-table mapping described in the PPT?</summary><p><strong>Destination and outgoing line.</strong></p></details>
+<details><summary>3. Why does packet 4 use a different route in the PPT example?</summary><p>Router A has learned about a traffic jam on the A–C–E path and updated its routing table.</p></details>
+</section>
+<div class="footer">Computer Networks • JSSSTU 24CS510 • Unit 1 • Topic 03<br>Built from the uploaded Unit-01 PPT and the stated syllabus scope.</div>
+</main></body></html>"""
+
+OUTPUT_FILE.write_text(html, encoding="utf-8")
+print("Topic page generated successfully!")
+print(f"Output: {OUTPUT_FILE}")
+print("Open the HTML file in your browser.")
