@@ -150,4 +150,9 @@ table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}th,td{b
 <p>The PPT’s example has East and West connected through two routes, <strong>CF</strong> and <strong>EI</strong>. If most traffic uses CF, its queueing delay increases and EI can appear more attractive. Traffic shifts to EI; a later routing update may make CF attractive again, causing traffic to shift back. This repeated switching is <strong>route oscillation</strong>.</p>
 <ol><li>Use multipath routing where suitable rather than forcing all traffic onto one route.</li><li>Change traffic distribution slowly enough for the routing system to converge.</li><li>Use traffic engineering by slowly changing the inputs/weights used by the routing protocol.</li></ol>
 <p class="note">The CF/EI story and the oscillation sequence are the lecture’s concrete example; keep them alongside any generalized routing explanation.</p></section>
-</main></body></html>
+</main>
+<section data-source-alignment="true" style="max-width:1000px;margin:28px auto;padding:22px 24px;border:1px solid #b7c7e8;border-left:5px solid #6658e8;border-radius:16px;background:linear-gradient(135deg,#f6f7ff,#ffffff);color:#17243b;font:15px/1.65 system-ui,-apple-system,'Segoe UI',sans-serif">
+<style>body.dark section[data-source-alignment="true"]{background:#171f30!important;color:#e8edf8!important;border-color:#3c4770!important} section[data-source-alignment="true"] h2{margin:0 0 12px;font-size:1.25rem} section[data-source-alignment="true"] p{margin:10px 0} section[data-source-alignment="true"] strong{color:#5145b9}</style>
+<h2>📌 PPT East–West example</h2><p>In the slide diagram, the West and East parts are connected by links CF and EI. If CF carries most East–West traffic, its queueing delay rises and EI becomes attractive. Once traffic shifts to EI, EI becomes loaded and the next update can make CF appear shorter again. This is route oscillation. The PPT's two remedies are multipath routing and shifting traffic slowly enough to converge; slowly changing routing-protocol inputs outside the protocol is called <strong>traffic engineering</strong>.</p>
+</section>
+</body></html>
